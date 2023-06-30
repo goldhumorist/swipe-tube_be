@@ -1,8 +1,7 @@
 name: GitHub Action - SonarCloud Checking
 on:
   push:
-    branches:
-      - master
+    branches: [master, develop]
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
