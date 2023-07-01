@@ -1,9 +1,11 @@
-name: GitHub Action - Build
+name: GitHub Action - Build and SonarCloud Checking
 on:
   push:
     branches: [master, develop]
   pull_request:
     branches: [master, develop]
+    types: [opened, synchronize, reopened]
+
 jobs:
   check-build:
     runs-on: ubuntu-latest
@@ -12,11 +14,24 @@ jobs:
         node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
-      - name: Staring Node.js ${{ matrix.node-version }}
+      - name: Starting Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: install modules
-        run: npm install
-      - name: build project
+      - name: Install modules
+        run: npm ci
+      - name: Build project
         run: npm run build
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
