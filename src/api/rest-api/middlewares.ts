@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { pinoForLogger } from './../../lib/infrastructure/logger';
+import { pinoForLogger } from './../../infrastructure/logger';
 import pinoHttp from 'pino-http';
 import cors from 'cors';
 import bodyParser from 'body-parser';

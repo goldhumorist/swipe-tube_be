@@ -1,6 +1,6 @@
 import * as RestAPI from './api/rest-api/www';
 import { config } from './config';
-import { loggerFactory } from './lib/infrastructure/logger';
+import { loggerFactory } from './infrastructure/logger';
 
 const logger = loggerFactory.getLogger(__filename);
 

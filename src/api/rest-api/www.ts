@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { loggerFactory } from '../../lib/infrastructure/logger';
+import { loggerFactory } from '../../infrastructure/logger';
 import { promisify } from 'util';
 import { middlewares } from './middlewares';
 
@@ -16,7 +16,7 @@ app.use((req: Request, res: Response) => {
   res.end('OK');
 });
 
-let server: any = null;
+let server;
 
 export function start({ appPort }) {
   const normalizedPort = normalizePort(appPort);
@@ -39,7 +39,7 @@ export async function stop() {
  * Helper
  * Normalize a port into a number, string, or false.
  */
-function normalizePort(val: any) {
+function normalizePort(val) {
   const port = parseInt(val, 10);
 
   if (Number.isNaN(port)) {
