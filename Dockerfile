@@ -4,11 +4,18 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
-COPY . .
+COPY ./src ./src
+COPY ./tsconfig.json .
+COPY ./migrations ./migrations
+COPY ./config ./config
+COPY ./.env .
+COPY ./.sequelizerc .
 
 RUN npm run build
+
+USER node
 
 EXPOSE 8080
 
