@@ -9,7 +9,7 @@ import { IUser, User } from './../../domain-model/user.model';
 import UseCaseBase from '../base';
 import { IUserSignupParams } from '../interfaces';
 import { loggerFactory } from './../../infrastructure/logger';
-import { S3Client } from './../../infrastructure/s3';
+import { s3Client } from './../../infrastructure/s3';
 import path from 'path';
 import { v4 } from 'uuid';
 
@@ -21,11 +21,7 @@ export default class UserSignup extends UseCaseBase<
 > {
   static validationRules = {
     file: 'any_object',
-    mimetype: [
-      {
-        one_of: ['image/jpeg', 'image/jpg', 'image/png'],
-      },
-    ],
+    mimetype: [{ one_of: ['image/jpeg', 'image/jpg', 'image/png'] }],
     email: ['required', 'email', { max_length: 255 }, 'to_lc'],
     username: ['required', 'to_lc'],
     password: ['required', { min_length: 12 }],
@@ -59,7 +55,7 @@ export default class UserSignup extends UseCaseBase<
         avatarUrlPath,
       });
 
-      if (file) await S3Client.uploadFileToS3(paramsForUploadingFile);
+      if (file) await s3Client.uploadFileToS3(paramsForUploadingFile);
 
       return { data: this.dumpUser(user) };
     } catch (error: any) {

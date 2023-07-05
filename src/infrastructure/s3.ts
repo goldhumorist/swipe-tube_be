@@ -8,7 +8,7 @@ import { IUploadFileData } from './interfaces';
 
 const { accessKeyId, secretAccessKey, bucket, bucketRegion } = config.S3;
 
-export class AWS_S3 {
+export class S3Client {
   private S3Instance: S3;
 
   constructor() {
@@ -39,4 +39,4 @@ export class AWS_S3 {
   }
 }
 
-export const S3Client = new AWS_S3();
+export const s3Client = new S3Client();
