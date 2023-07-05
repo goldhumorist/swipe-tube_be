@@ -6,7 +6,7 @@ import { chista } from '../../utils';
 import UserSignup from '../../../../use-cases/user/signup';
 
 const logger = loggerFactory.getLogger(__filename);
-const upload = multer();
+const upload = multer({ limits: { fileSize: 3000000 } });
 
 export default {
   signup: async (req: Request, res: Response) => {
