@@ -1,4 +1,5 @@
 /* eslint-disable */
+import express from 'express';
 import { pinoForLogger } from './../../infrastructure/logger';
 import pinoHttp from 'pino-http';
 import cors from 'cors';
@@ -23,4 +24,5 @@ export const middlewares = {
   urlencoded: bodyParser.urlencoded({ extended: true }),
   cors: cors({ origin: '*' }), // We allow any origin because we DO NOT USE cookies and basic auth
   helmet: helmet(),
+  json: express.json(),
 };

@@ -1,5 +1,6 @@
 import * as RestAPI from './api/rest-api/www';
 import { config } from './config';
+import { Database } from './domain-model';
 import { loggerFactory } from './infrastructure/logger';
 
 const logger = loggerFactory.getLogger(__filename);
@@ -8,6 +9,8 @@ async function main() {
   logger.info(`[App] Init Mode: ${config.nodeEnv}`);
 
   RestAPI.start({ appPort: config.server.port });
+
+  Database.initModels();
 
   process.on('SIGTERM', async () => {
     logger.info('[App] SIGTERM signal catched');

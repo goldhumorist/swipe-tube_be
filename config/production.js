@@ -7,4 +7,19 @@ module.exports = {
   server: {
     port: process.env.PORT || 8080,
   },
+  database: {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    dialect: process.env.DB_DIALECT,
+    schema: process.env.DB_SCHEMA,
+  },
+  S3: {
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    bucket: process.env.S3_BUCKET_NAME,
+    bucketRegion: process.env.S3_BUCKET_REGION,
+  },
 };

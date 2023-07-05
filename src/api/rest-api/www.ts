@@ -1,20 +1,20 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { loggerFactory } from '../../infrastructure/logger';
 import { promisify } from 'util';
 import { middlewares } from './middlewares';
+import userRouter from './user/router';
 
 const logger = loggerFactory.getLogger(__filename);
 
 const app = express();
 
+app.use(middlewares.json);
 app.use(middlewares.urlencoded);
 app.use(middlewares.cors);
 app.use(middlewares.helmet);
 app.use(middlewares.loggerMiddleware);
 
-app.use((req: Request, res: Response) => {
-  res.end('OK');
-});
+app.use('/api/v1/user', userRouter);
 
 let server;
 
