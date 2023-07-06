@@ -8,12 +8,9 @@ import { NotUniqueX } from './../../domain-model/domain-model-exeption';
 import { IUser, User } from './../../domain-model/user.model';
 import UseCaseBase from '../base';
 import { IUserSignupParams } from '../interfaces';
-import { loggerFactory } from './../../infrastructure/logger';
 import { s3Client } from './../../infrastructure/s3';
 import path from 'path';
 import { v4 } from 'uuid';
-
-const logger = loggerFactory.getLogger(__filename);
 
 export default class UserSignup extends UseCaseBase<
   IUserSignupParams,
@@ -46,12 +43,10 @@ export default class UserSignup extends UseCaseBase<
     }
 
     try {
-      const passwordHash = await User._hashPassword(password);
-
       user = await User.create({
         username,
         email,
-        password: passwordHash,
+        password,
         avatarUrlPath,
       });
 

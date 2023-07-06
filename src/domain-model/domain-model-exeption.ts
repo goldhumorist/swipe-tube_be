@@ -3,7 +3,7 @@ import { IDMExceptionData } from './interfaces';
 export class BaseError extends Error {
   message: string;
   field: string;
-  parent: Error;
+  parent: Error | undefined;
 
   constructor(data: IDMExceptionData) {
     super();
@@ -13,11 +13,14 @@ export class BaseError extends Error {
 
     this.message = data.message;
     this.field = data.field;
-    this.parent = data.parent;
+    if (this.parent) {
+      this.parent = data.parent;
+    }
   }
 }
 
 export class NotUniqueX extends BaseError {}
+export class NotFoundX extends BaseError {}
 export class WrongParameterValueX extends BaseError {}
 
 export default {
