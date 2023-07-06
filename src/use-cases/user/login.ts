@@ -19,6 +19,7 @@ export default class UserLogin extends UseCaseBase<
 
   async execute(data: IUserLoginParams): Promise<IUserLoginFullResponse> {
     const { email, password } = data;
+
     try {
       const user: IUser = await User.findByEmail(email);
 
@@ -42,6 +43,7 @@ export default class UserLogin extends UseCaseBase<
           message: 'Wrong email or password',
         });
       }
+
       throw error;
     }
   }

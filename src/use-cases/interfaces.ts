@@ -20,6 +20,7 @@ export interface IUserSignupDumpedResponse {
 export interface IUserSignupFullResponse {
   data: IUserSignupDumpedResponse;
 }
+
 export interface IUserLoginDumpedResponse {
   email: string;
   username: string;
@@ -28,6 +29,7 @@ export interface IUserLoginDumpedResponse {
 export interface IUserLoginFullResponse {
   data: IUserLoginDumpedResponse;
 }
+
 export interface IUserLoginParams {
   email: string;
   password: string;

@@ -76,12 +76,14 @@ export class User extends Base<IUser> {
 
   static async findByEmail(email: string) {
     const user: IUser | null = await User.findOne({ where: { email } });
+
     if (!user) {
       throw new NotFoundX({
         message: 'USER_NOT_FOUND',
         field: 'email',
       });
     }
+
     return user;
   }
 
@@ -92,6 +94,7 @@ export class User extends Base<IUser> {
   static async _hashPassword(plainPassword: string) {
     return bcrypt.hash(plainPassword, PASSWORD_HASH_SALT_ROUNDS);
   }
+
   static async isPasswordValid(password: string, encryptedPassword: string) {
     return bcrypt.compare(password, encryptedPassword);
   }
