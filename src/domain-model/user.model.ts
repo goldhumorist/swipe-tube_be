@@ -11,9 +11,11 @@ import {
   Default,
   CreatedAt,
   UpdatedAt,
+  BeforeCreate,
 } from 'sequelize-typescript';
 import { Base } from './base';
 import bcrypt from 'bcrypt';
+import { NotFoundX } from './domain-model-exeption';
 
 export interface IUser {
   id?: number;
@@ -51,6 +53,11 @@ export class User extends Base<IUser> {
   @Column(DataType.STRING)
   password: string;
 
+  @BeforeCreate
+  static async hashPassword(instance: User): Promise<void> {
+    instance.password = await User._hashPassword(instance.password);
+  }
+
   @AllowNull(true)
   @Column({ type: DataType.STRING, field: 'avatar_url_path' })
   avatarUrlPath: string | null;
@@ -67,11 +74,28 @@ export class User extends Base<IUser> {
   @UpdatedAt
   updatedAt: Date;
 
+  static async findByEmail(email: string) {
+    const user: IUser | null = await User.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundX({
+        message: 'USER_NOT_FOUND',
+        field: 'email',
+      });
+    }
+
+    return user;
+  }
+
   async destroyById(id: number) {
     return User.destroy({ where: { id } });
   }
 
-  static async _hashPassword(plainPassword) {
+  static async _hashPassword(plainPassword: string) {
     return bcrypt.hash(plainPassword, PASSWORD_HASH_SALT_ROUNDS);
+  }
+
+  static async isPasswordValid(password: string, encryptedPassword: string) {
+    return bcrypt.compare(password, encryptedPassword);
   }
 }

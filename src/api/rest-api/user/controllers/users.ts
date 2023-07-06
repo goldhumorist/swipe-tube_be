@@ -4,6 +4,7 @@ import { loggerFactory } from '../../../../infrastructure/logger';
 import multer from 'multer';
 import { chista } from '../../utils';
 import UserSignup from '../../../../use-cases/user/signup';
+import UserLogin from '../../../../use-cases/user/login';
 
 const logger = loggerFactory.getLogger(__filename);
 const upload = multer({ limits: { fileSize: 3000000 } });
@@ -45,4 +46,5 @@ export default {
       res.send(errorResponse);
     }
   },
+  login: chista.makeUseCaseRunner(UserLogin, (req: Request) => req.body),
 };
