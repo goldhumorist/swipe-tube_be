@@ -4,7 +4,7 @@ import {
   IUserSignupDumpedResponse,
 } from './../interfaces';
 import { ERROR_CODE, Exception } from '../../global-help-utils/';
-import { NotUniqueX } from './../../domain-model/domain-model-exeption';
+import { NotUniqueX } from '../../domain-model/domain-model-exception';
 import { IUser, User } from './../../domain-model/user.model';
 import UseCaseBase from '../base';
 import { IUserSignupParams } from '../interfaces';

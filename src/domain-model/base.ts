@@ -1,4 +1,4 @@
-import { NotUniqueX } from './domain-model-exeption';
+import { NotUniqueX } from './domain-model-exception';
 import { UniqueConstraintError } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 

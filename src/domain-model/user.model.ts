@@ -15,7 +15,7 @@ import {
 } from 'sequelize-typescript';
 import { Base } from './base';
 import bcrypt from 'bcrypt';
-import { NotFoundX } from './domain-model-exeption';
+import { NotFoundX } from './domain-model-exception';
 
 export interface IUser {
   id?: number;
