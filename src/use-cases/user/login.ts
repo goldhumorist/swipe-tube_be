@@ -2,11 +2,12 @@ import {
   IUserLoginFullResponse,
   IUserLoginDumpedResponse,
   IUserLoginParams,
-} from './../interfaces';
+} from '../interface';
 import { ERROR_CODE, Exception } from '../../global-help-utils/';
 import { NotFoundX } from './../../domain-model/domain-model-exeption';
 import { IUser, User } from './../../domain-model/user.model';
-import UseCaseBase from '../base';
+import UseCaseBase from '../../base';
+import jwtUtils from '../utils/jwtUtils';
 
 export default class UserLogin extends UseCaseBase<
   IUserLoginParams,
@@ -30,8 +31,12 @@ export default class UserLogin extends UseCaseBase<
 
       if (!isPasswordValid) {
         throw new Exception({
-          code: ERROR_CODE.UNAUTHORIZED,
-          message: 'Wrong email or password',
+          code: ERROR_CODE.AUTHENTICATION,
+          message: 'Authentication failed',
+          fields: {
+            email: 'INVALID',
+            password: 'INVALID',
+          },
         });
       }
 
@@ -39,8 +44,12 @@ export default class UserLogin extends UseCaseBase<
     } catch (error) {
       if (error instanceof NotFoundX) {
         throw new Exception({
-          code: ERROR_CODE.UNAUTHORIZED,
-          message: 'Wrong email or password',
+          code: ERROR_CODE.AUTHENTICATION,
+          message: 'Authentication failed',
+          fields: {
+            email: 'INVALID',
+            password: 'INVALID',
+          },
         });
       }
 
@@ -52,6 +61,7 @@ export default class UserLogin extends UseCaseBase<
     const dumpedResponse: IUserLoginDumpedResponse = {
       username: user.username,
       email: user.email,
+      accessToken: jwtUtils.generateToken({ userId: user.id }),
     };
 
     return dumpedResponse;

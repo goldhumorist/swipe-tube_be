@@ -22,4 +22,7 @@ module.exports = {
     bucket: process.env.S3_BUCKET_NAME,
     bucketRegion: process.env.S3_BUCKET_REGION,
   },
+  session: {
+    secret: process.env.JWT_SECRET,
+  },
 };

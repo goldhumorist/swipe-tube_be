@@ -2,7 +2,7 @@ import { ERROR_CODE } from '../../../../global-help-utils/enums';
 import { Request, Response } from 'express';
 import { loggerFactory } from '../../../../infrastructure/logger';
 import multer from 'multer';
-import { chista } from '../../utils';
+import { chista } from '../../../utils';
 import UserSignup from '../../../../use-cases/user/signup';
 import UserLogin from '../../../../use-cases/user/login';
 

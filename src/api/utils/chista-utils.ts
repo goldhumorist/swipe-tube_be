@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-import { Exception, ERROR_CODE } from '../../../global-help-utils';
-import { loggerFactory } from '../../../infrastructure/logger';
-import UseCaseBase from '../../../use-cases/base';
+import { Exception, ERROR_CODE } from '../../global-help-utils';
+import { loggerFactory } from '../../infrastructure/logger';
+import UseCaseBase from '../../base';
 import { Request, Response } from 'express';
+import { IRequest } from '../rest-api/interfaces';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -52,7 +53,7 @@ export function makeUseCaseRunner(
 }
 
 export async function renderPromiseAsJson(
-  req: Request,
+  req: Request | IRequest,
   res: Response,
   promise: Promise<any>,
 ) {

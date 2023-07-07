@@ -86,6 +86,18 @@ export class User extends Base<IUser> {
 
     return user;
   }
+  static async findById(id: number) {
+    const user: IUser | null = await User.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundX({
+        message: 'USER_NOT_FOUND',
+        field: 'email',
+      });
+    }
+
+    return user;
+  }
 
   async destroyById(id: number) {
     return User.destroy({ where: { id } });
