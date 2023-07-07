@@ -4,7 +4,7 @@ import {
   IUserLoginParams,
 } from '../interface';
 import { ERROR_CODE, Exception } from '../../global-help-utils/';
-import { NotFoundX } from '../../domain-model/domain-model-exception';
+import { NotFoundX } from './../../domain-model/domain-model-exception';
 import { IUser, User } from './../../domain-model/user.model';
 import UseCaseBase from '../../base';
 import jwtUtils from '../utils/jwtUtils';
@@ -32,11 +32,7 @@ export default class UserLogin extends UseCaseBase<
       if (!isPasswordValid) {
         throw new Exception({
           code: ERROR_CODE.AUTHENTICATION,
-          message: 'Authentication failed',
-          fields: {
-            email: 'INVALID',
-            password: 'INVALID',
-          },
+          message: 'Wrong email or password',
         });
       }
 
@@ -45,11 +41,7 @@ export default class UserLogin extends UseCaseBase<
       if (error instanceof NotFoundX) {
         throw new Exception({
           code: ERROR_CODE.AUTHENTICATION,
-          message: 'Authentication failed',
-          fields: {
-            email: 'INVALID',
-            password: 'INVALID',
-          },
+          message: 'Wrong email or password',
         });
       }
 
