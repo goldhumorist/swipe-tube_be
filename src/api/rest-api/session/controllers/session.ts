@@ -1,26 +1,35 @@
-import SessionCheck from '../../../../use-cases/session/sessionCheck';
+import { SessionCheck } from '../../../../use-cases/session/sessionCheck';
 import { IRequest } from '../../interfaces';
-import { NextFunction, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { chista } from '../../../utils';
 import { ISessionFullResponse } from '../../../../use-cases/interface';
 
 export default {
+  checkToken: chista.makeUseCaseRunner(SessionCheck, (req: Request) => ({
+    token: req.headers?.authorization?.replace('Bearer ', ''),
+  })),
+
   checkSession: async (req: IRequest, res: Response, next: NextFunction) => {
-    // Run usecase that checks, if token valid and user exists
+    const reqToken = req.headers?.authorization;
+
+    const token = reqToken?.replace('Bearer ', '');
+
     const sessionCheckPromise: Promise<ISessionFullResponse> =
       chista.runUseCase(SessionCheck, {
-        params: { token: req.headers.authorization },
+        params: { token },
       });
 
     try {
       const {
-        sessionResponse: { userId },
+        data: { userId },
       } = await sessionCheckPromise;
-      req.session = {
-        context: {
-          userId,
-        },
-      };
+
+      if (userId)
+        req.session = {
+          context: {
+            userId,
+          },
+        };
 
       return next();
     } catch (error) {

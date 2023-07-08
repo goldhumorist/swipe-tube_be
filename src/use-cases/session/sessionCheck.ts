@@ -1,11 +1,16 @@
-import { User } from '../../domain-model/user.model';
-import { ERROR_CODE, Exception } from '../../global-help-utils';
-import jwtUtils from '../utils/jwtUtils';
+import { ERROR_CODE } from '../../global-help-utils/enums';
+import { Exception } from '../../global-help-utils/exception';
+import { IUser, User } from '../../domain-model/user.model';
 import UseCaseBase from '../../base';
-import { ISessionCheckParams, ISessionFullResponse } from '../interface';
+import {
+  ISessionCheckParams,
+  ISessionFullResponse,
+  ISessionDumpedResponse,
+} from '../interface';
+import jwtUtils from '../utils/jwtUtils';
 import { JwtPayload } from 'jsonwebtoken';
 
-export default class SessionCheck extends UseCaseBase<
+export class SessionCheck extends UseCaseBase<
   ISessionCheckParams,
   ISessionFullResponse
 > {
@@ -14,18 +19,28 @@ export default class SessionCheck extends UseCaseBase<
   };
   async execute(data: ISessionCheckParams): Promise<ISessionFullResponse> {
     try {
-      const formattedToken = data?.token?.replace('Bearer ', '');
+      const userData = jwtUtils.checkToken(data.token) as JwtPayload;
 
-      const userData = jwtUtils.checkToken(formattedToken) as JwtPayload;
+      const user: IUser = await User.findById(userData?.userId);
 
-      await User.findById(userData?.userId);
-
-      return { sessionResponse: { userId: userData?.userId } };
+      return { data: this.dumpTokenResponse(user) };
     } catch (error) {
       throw new Exception({
         code: ERROR_CODE.AUTHENTICATION,
         message: 'Authentication error',
       });
     }
+  }
+
+  dumpTokenResponse(user: IUser): ISessionDumpedResponse {
+    const dumpedResponse: ISessionDumpedResponse = {
+      email: user.email,
+      username: user.username,
+    };
+
+    if (user.id) dumpedResponse.userId = user.id;
+    if (user.avatarUrlPath) dumpedResponse.avatarUrlPath = user.avatarUrlPath;
+
+    return dumpedResponse;
   }
 }

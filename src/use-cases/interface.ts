@@ -1,11 +1,15 @@
+export interface ISessionDumpedResponse {
+  userId?: number;
+  email: string;
+  username: string;
+  avatarUrlPath?: string | null;
+}
 export interface ISessionCheckParams {
   token: string;
 }
 
 export interface ISessionFullResponse {
-  sessionResponse: {
-    userId: number;
-  };
+  data: ISessionDumpedResponse;
 }
 
 export interface IUserSignupParams {
@@ -22,6 +26,7 @@ export interface IUserSignupParams {
 }
 
 export interface IUserSignupDumpedResponse {
+  userId?: number;
   username: string;
   email: string;
   avatarUrlPath?: string | null;
@@ -33,8 +38,10 @@ export interface IUserSignupFullResponse {
 }
 
 export interface IUserLoginDumpedResponse {
+  userId?: number;
   email: string;
   username: string;
+  avatarUrlPath?: string | null;
   accessToken: string;
 }
 

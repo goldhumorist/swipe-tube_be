@@ -2,8 +2,8 @@ import express from 'express';
 import controllers from './controllers';
 const router = express.Router();
 
-const checkSession = controllers.session.checkSession;
+const checkToken = controllers.session.checkToken;
 
-router.get('/check', checkSession);
+router.get('/check', checkToken);
 
 export default router;

@@ -74,6 +74,7 @@ export default class UserSignup extends UseCaseBase<
       accessToken: jwtUtils.generateToken({ userId: user.id }),
     };
 
+    if (user.id) dumpedResponse.userId = user.id;
     if (user.avatarUrlPath) dumpedResponse.avatarUrlPath = user.avatarUrlPath;
 
     return dumpedResponse;
