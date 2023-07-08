@@ -20,6 +20,12 @@ interface IConfig {
     bucket: string;
     bucketRegion: string;
   };
+  session: {
+    jwtSecret: string;
+    jwtConfiguration: {
+      expiresIn: string;
+    };
+  };
 }
 
 export const config: IConfig = {
@@ -27,4 +33,5 @@ export const config: IConfig = {
   server: nodeConfig.get('server'),
   database: nodeConfig.get('database'),
   S3: nodeConfig.get('S3'),
+  session: nodeConfig.get('session'),
 };

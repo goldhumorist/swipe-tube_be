@@ -23,6 +23,9 @@ module.exports = {
     bucketRegion: process.env.S3_BUCKET_REGION,
   },
   session: {
-    secret: process.env.JWT_SECRET,
+    jwtSecret: process.env.JWT_SECRET,
+    jwtConfiguration: {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    },
   },
 };

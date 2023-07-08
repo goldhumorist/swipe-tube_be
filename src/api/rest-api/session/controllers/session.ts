@@ -13,7 +13,9 @@ export default {
       });
 
     try {
-      const { userId } = await sessionCheckPromise;
+      const {
+        sessionResponse: { userId },
+      } = await sessionCheckPromise;
       req.session = {
         context: {
           userId,

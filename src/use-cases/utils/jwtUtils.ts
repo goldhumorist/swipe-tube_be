@@ -1,13 +1,15 @@
 import jwt from 'jsonwebtoken';
+import { config } from '../../config';
 
-const tokenSecret: string = require('config').get('session').secret;
+const JWT_SECRET: string = config.session.jwtSecret;
+
+const JWT_CONFIGURATION = config.session.jwtConfiguration;
 
 export default {
   generateToken(payload: string | object) {
-    return jwt.sign(payload, tokenSecret);
+    return jwt.sign(payload, JWT_SECRET, JWT_CONFIGURATION);
   },
   checkToken(token: string) {
-    const tokenNoBearer = token?.split(' ')[1];
-    return jwt.verify(tokenNoBearer, tokenSecret);
+    return jwt.verify(token, JWT_SECRET);
   },
 };

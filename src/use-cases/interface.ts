@@ -3,7 +3,9 @@ export interface ISessionCheckParams {
 }
 
 export interface ISessionFullResponse {
-  userId: number;
+  sessionResponse: {
+    userId: number;
+  };
 }
 
 export interface IUserSignupParams {

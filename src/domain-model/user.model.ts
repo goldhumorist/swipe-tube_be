@@ -92,7 +92,7 @@ export class User extends Base<IUser> {
     if (!user) {
       throw new NotFoundX({
         message: 'USER_NOT_FOUND',
-        field: 'email',
+        field: 'id',
       });
     }
 

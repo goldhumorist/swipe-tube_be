@@ -4,7 +4,6 @@ import jwtUtils from '../utils/jwtUtils';
 import UseCaseBase from '../../base';
 import { ISessionCheckParams, ISessionFullResponse } from '../interface';
 import { JwtPayload } from 'jsonwebtoken';
-import { NotFoundX } from '../../domain-model/domain-model-exception';
 
 export default class SessionCheck extends UseCaseBase<
   ISessionCheckParams,
@@ -15,24 +14,17 @@ export default class SessionCheck extends UseCaseBase<
   };
   async execute(data: ISessionCheckParams): Promise<ISessionFullResponse> {
     try {
-      const userData = jwtUtils.checkToken(data.token);
+      const formattedToken = data?.token?.replace('Bearer ', '');
 
-      await User.findById((userData as JwtPayload)?.userId);
+      const userData = jwtUtils.checkToken(formattedToken) as JwtPayload;
 
-      return { userId: (userData as JwtPayload)?.userId };
+      await User.findById(userData?.userId);
+
+      return { sessionResponse: { userId: userData?.userId } };
     } catch (error) {
-      if (error instanceof NotFoundX) {
-        throw new Exception({
-          code: ERROR_CODE.WRONG_TOKEN,
-          message: 'Authentication error, wrong token',
-          fields: { token: 'WRONG_ID' },
-        });
-      }
-
       throw new Exception({
-        code: ERROR_CODE.WRONG_TOKEN,
-        message: 'Authentication error, wrong token',
-        fields: { token: 'WRONG_ID' },
+        code: ERROR_CODE.AUTHENTICATION,
+        message: 'Authentication error',
       });
     }
   }
