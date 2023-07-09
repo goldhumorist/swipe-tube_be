@@ -56,3 +56,7 @@ Before running router to be sure that all services are running via docker-compos
 | S3_SECRET_ACCESS_KEY   | YES         | Secret Access key for AWS S3 Bucket  | S3_SECRET_ACCESS_KEY          |
 | S3_BUCKET_NAME         | YES         | AWS S3 Bucket Name                   | S3_BUCKET_NAME                |
 | S3_BUCKET_REGION       | YES         | AWS S3 Bucket Region                 | S3_BUCKET_REGION              |
+|                        |             |                                      |                               |
+| #SESSION               |             |                                      |                               |
+| JWT_SECRET             | YES         | Secret key for token generation      | JWT_SECRET                    |
+| JWT_EXPIRES_IN         | YES         | The time in which token expires      | 24h                           |

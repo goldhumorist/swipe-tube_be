@@ -1,3 +1,17 @@
+export interface ISessionDumpedResponse {
+  userId?: number;
+  email: string;
+  username: string;
+  avatarUrlPath?: string | null;
+}
+export interface ISessionCheckParams {
+  token: string;
+}
+
+export interface ISessionFullResponse {
+  data: ISessionDumpedResponse;
+}
+
 export interface IUserSignupParams {
   file: {
     buffer: Buffer;
@@ -12,9 +26,11 @@ export interface IUserSignupParams {
 }
 
 export interface IUserSignupDumpedResponse {
+  userId?: number;
   username: string;
   email: string;
   avatarUrlPath?: string | null;
+  accessToken: string;
 }
 
 export interface IUserSignupFullResponse {
@@ -22,8 +38,11 @@ export interface IUserSignupFullResponse {
 }
 
 export interface IUserLoginDumpedResponse {
+  userId?: number;
   email: string;
   username: string;
+  avatarUrlPath?: string | null;
+  accessToken: string;
 }
 
 export interface IUserLoginFullResponse {
@@ -33,4 +52,16 @@ export interface IUserLoginFullResponse {
 export interface IUserLoginParams {
   email: string;
   password: string;
+}
+
+export interface IListVideosParams {
+  mock: string;
+}
+
+export interface IListVideosResponse {
+  mock: string;
+}
+
+export interface IUserJWTPayload {
+  userId: number;
 }

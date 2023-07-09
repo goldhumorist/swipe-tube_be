@@ -3,6 +3,8 @@ import { loggerFactory } from '../../infrastructure/logger';
 import { promisify } from 'util';
 import { middlewares } from './middlewares';
 import userRouter from './user/router';
+import videoRouter from './video/router';
+import sessionRouter from './session/router';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -15,6 +17,8 @@ app.use(middlewares.helmet);
 app.use(middlewares.loggerMiddleware);
 
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/video', videoRouter);
+app.use('/api/v1/session', sessionRouter);
 
 let server;
 

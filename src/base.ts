@@ -1,4 +1,4 @@
-import { Exception, ERROR_CODE } from '../global-help-utils';
+import { Exception, ERROR_CODE } from './global-help-utils';
 import LIVR from 'livr';
 
 LIVR.Validator.defaultAutoTrim(true);
