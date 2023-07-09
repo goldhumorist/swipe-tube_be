@@ -86,22 +86,6 @@ export class User extends Base<IUser> {
 
     return user;
   }
-  static async findById(id: number) {
-    const user: IUser | null = await User.findOne({ where: { id } });
-
-    if (!user) {
-      throw new NotFoundX({
-        message: 'USER_NOT_FOUND',
-        field: 'id',
-      });
-    }
-
-    return user;
-  }
-
-  async destroyById(id: number) {
-    return User.destroy({ where: { id } });
-  }
 
   static async _hashPassword(plainPassword: string) {
     return bcrypt.hash(plainPassword, PASSWORD_HASH_SALT_ROUNDS);

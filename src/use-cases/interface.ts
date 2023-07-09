@@ -61,3 +61,7 @@ export interface IListVideosParams {
 export interface IListVideosResponse {
   mock: string;
 }
+
+export interface IUserJWTPayload {
+  userId: number;
+}

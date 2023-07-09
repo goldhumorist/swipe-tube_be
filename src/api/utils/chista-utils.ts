@@ -31,7 +31,7 @@ export async function runUseCase(
 
     return result;
   } catch (error: any) {
-    logRequest('error', error.message, startTime);
+    logRequest('error', error, startTime);
 
     throw error;
   }

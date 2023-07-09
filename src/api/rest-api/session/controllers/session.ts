@@ -5,14 +5,16 @@ import { chista } from '../../../utils';
 import { ISessionFullResponse } from '../../../../use-cases/interface';
 
 export default {
-  checkToken: chista.makeUseCaseRunner(SessionCheck, (req: Request) => ({
+  checkSession: chista.makeUseCaseRunner(SessionCheck, (req: Request) => ({
     token: req.headers?.authorization?.replace('Bearer ', ''),
   })),
 
-  checkSession: async (req: IRequest, res: Response, next: NextFunction) => {
-    const reqToken = req.headers?.authorization;
-
-    const token = reqToken?.replace('Bearer ', '');
+  checkSessionMiddleware: async (
+    req: IRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const token = req.headers?.authorization?.replace('Bearer ', '');
 
     const sessionCheckPromise: Promise<ISessionFullResponse> =
       chista.runUseCase(SessionCheck, {
@@ -20,9 +22,8 @@ export default {
       });
 
     try {
-      const {
-        data: { userId },
-      } = await sessionCheckPromise;
+      const { data } = await sessionCheckPromise;
+      const { userId } = data;
 
       if (userId)
         req.session = {
@@ -30,7 +31,6 @@ export default {
             userId,
           },
         };
-
       return next();
     } catch (error) {
       return chista.renderPromiseAsJson(req, res, sessionCheckPromise);

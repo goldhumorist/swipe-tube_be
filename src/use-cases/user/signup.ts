@@ -69,12 +69,12 @@ export default class UserSignup extends UseCaseBase<
 
   dumpUser(user: IUser): IUserSignupDumpedResponse {
     const dumpedResponse: IUserSignupDumpedResponse = {
+      userId: user.id,
       username: user.username,
       email: user.email,
       accessToken: jwtUtils.generateToken({ userId: user.id }),
     };
 
-    if (user.id) dumpedResponse.userId = user.id;
     if (user.avatarUrlPath) dumpedResponse.avatarUrlPath = user.avatarUrlPath;
 
     return dumpedResponse;

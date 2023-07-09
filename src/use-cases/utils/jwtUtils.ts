@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../../config';
 
-const JWT_SECRET: string = config.session.jwtSecret;
+const JWT_SECRET = config.session.jwtSecret;
 
-const JWT_CONFIGURATION = config.session.jwtConfiguration;
+const JWT_CONFIGURATION = {
+  expiresIn: config.session.jwtExpiresIn,
+};
 
 export default {
   generateToken(payload: string | object) {

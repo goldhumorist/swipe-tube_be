@@ -6,9 +6,9 @@ import {
   ISessionCheckParams,
   ISessionFullResponse,
   ISessionDumpedResponse,
+  IUserJWTPayload,
 } from '../interface';
 import jwtUtils from '../utils/jwtUtils';
-import { JwtPayload } from 'jsonwebtoken';
 
 export class SessionCheck extends UseCaseBase<
   ISessionCheckParams,
@@ -19,26 +19,26 @@ export class SessionCheck extends UseCaseBase<
   };
   async execute(data: ISessionCheckParams): Promise<ISessionFullResponse> {
     try {
-      const userData = jwtUtils.checkToken(data.token) as JwtPayload;
+      const { userId } = jwtUtils.checkToken(data.token) as IUserJWTPayload;
 
-      const user: IUser = await User.findById(userData?.userId);
+      const user = await User.findById<IUser>(userId);
 
-      return { data: this.dumpTokenResponse(user) };
+      return { data: this.dumpSessionResponse(user) };
     } catch (error) {
       throw new Exception({
-        code: ERROR_CODE.AUTHENTICATION,
-        message: 'Authentication error',
+        code: ERROR_CODE.AUTHENTICATION_FAILED,
+        message: 'Authentication failed',
       });
     }
   }
 
-  dumpTokenResponse(user: IUser): ISessionDumpedResponse {
+  dumpSessionResponse(user: IUser): ISessionDumpedResponse {
     const dumpedResponse: ISessionDumpedResponse = {
+      userId: user.id,
       email: user.email,
       username: user.username,
     };
 
-    if (user.id) dumpedResponse.userId = user.id;
     if (user.avatarUrlPath) dumpedResponse.avatarUrlPath = user.avatarUrlPath;
 
     return dumpedResponse;

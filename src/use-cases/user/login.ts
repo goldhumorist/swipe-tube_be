@@ -31,7 +31,7 @@ export default class UserLogin extends UseCaseBase<
 
       if (!isPasswordValid) {
         throw new Exception({
-          code: ERROR_CODE.AUTHENTICATION,
+          code: ERROR_CODE.AUTHENTICATION_FAILED,
           message: 'Wrong email or password',
         });
       }
@@ -40,7 +40,7 @@ export default class UserLogin extends UseCaseBase<
     } catch (error) {
       if (error instanceof NotFoundX) {
         throw new Exception({
-          code: ERROR_CODE.AUTHENTICATION,
+          code: ERROR_CODE.AUTHENTICATION_FAILED,
           message: 'Wrong email or password',
         });
       }
@@ -51,12 +51,12 @@ export default class UserLogin extends UseCaseBase<
 
   dumpUser(user: IUser): IUserLoginDumpedResponse {
     const dumpedResponse: IUserLoginDumpedResponse = {
+      userId: user.id,
       username: user.username,
       email: user.email,
       accessToken: jwtUtils.generateToken({ userId: user.id }),
     };
 
-    if (user.id) dumpedResponse.userId = user.id;
     if (user.avatarUrlPath) dumpedResponse.avatarUrlPath = user.avatarUrlPath;
 
     return dumpedResponse;
