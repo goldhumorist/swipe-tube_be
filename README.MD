@@ -59,4 +59,4 @@ Before running router to be sure that all services are running via docker-compos
 |                        |             |                                      |                               |
 | #SESSION               |             |                                      |                               |
 | JWT_SECRET             | YES         | Secret key for token generation      | JWT_SECRET                    |
-| JWT_EXPIRES_IN         | YES         | The time in which token expires      | JWT_EXPIRES_IN                |
+| JWT_EXPIRES_IN         | YES         | The time in which token expires      | 24h                           |

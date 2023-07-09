@@ -24,8 +24,6 @@ module.exports = {
   },
   session: {
     jwtSecret: process.env.JWT_SECRET,
-    jwtConfiguration: {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    },
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN,
   },
 };

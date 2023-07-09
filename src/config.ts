@@ -22,9 +22,7 @@ interface IConfig {
   };
   session: {
     jwtSecret: string;
-    jwtConfiguration: {
-      expiresIn: string;
-    };
+    jwtExpiresIn: string;
   };
 }
 
