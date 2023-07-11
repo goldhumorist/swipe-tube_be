@@ -4,14 +4,14 @@ import {
   IUserSignupDumpedResponse,
   IUserSignupParams,
 } from '../interface';
-import { ERROR_CODE, Exception } from '../../global-help-utils/';
+import { ERROR_CODE, Exception, FILES_PREFIX } from '../../global-help-utils/';
 import { NotUniqueX } from './../../domain-model/domain-model-exception';
 import { IUser, User } from './../../domain-model/user.model';
 import UseCaseBase from '../../base';
 import { s3Client } from './../../infrastructure/s3';
 import path from 'path';
 import { v4 } from 'uuid';
-import jwtUtils from '../utils/jwtUtils';
+import jwtUtils from '../utils/jwt';
 
 export default class UserSignup extends UseCaseBase<
   IUserSignupParams,
@@ -33,7 +33,7 @@ export default class UserSignup extends UseCaseBase<
 
     if (file) {
       const extention = path.extname(file.originalname);
-      avatarUrlPath = `image_${v4()}${extention}`;
+      avatarUrlPath = `${FILES_PREFIX.PROFILE_IMAGE}_${v4()}${extention}`;
 
       paramsForUploadingFile = {
         key: avatarUrlPath,
@@ -60,7 +60,7 @@ export default class UserSignup extends UseCaseBase<
           message: `'${error.field}' is not unique`,
         });
 
-      await user?.destroyById(user.id);
+      await user?.destroyInstance();
 
       throw error;
     }

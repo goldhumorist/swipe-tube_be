@@ -8,7 +8,7 @@ import {
   ISessionDumpedResponse,
   IUserJWTPayload,
 } from '../interface';
-import jwtUtils from '../utils/jwtUtils';
+import jwtUtils from '../utils/jwt';
 
 export class SessionCheck extends UseCaseBase<
   ISessionCheckParams,

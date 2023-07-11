@@ -22,9 +22,15 @@ export class Base<T extends object> extends Model<T> {
     return entity as T;
   }
 
-  async destroyById<T>(id: number): Promise<T> {
+  static async destroyById<T>(id: number): Promise<T> {
     return super.destroy({
       where: { id } as WhereOptions,
+    } as DestroyOptions) as T;
+  }
+
+  async destroyInstance<T>(): Promise<T> {
+    return super.destroy({
+      where: { id: this.id } as WhereOptions,
     } as DestroyOptions) as T;
   }
 
