@@ -19,7 +19,6 @@ export default class UserSignup extends UseCaseBase<
 > {
   static validationRules = {
     file: 'any_object',
-    mimetype: [{ one_of: ['image/jpeg', 'image/jpg', 'image/png'] }],
     email: ['required', 'email', { max_length: 255 }, 'to_lc'],
     username: ['required', 'to_lc'],
     password: ['required', { min_length: 12 }],
