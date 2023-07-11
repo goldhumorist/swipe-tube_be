@@ -7,7 +7,7 @@ import {
 import { ERROR_CODE, Exception, FILES_PREFIX } from '../../global-help-utils/';
 import { NotUniqueX } from './../../domain-model/domain-model-exception';
 import { IUser, User } from './../../domain-model/user.model';
-import UseCaseBase from '../../base';
+import UseCaseBase from '../base';
 import { s3Client } from './../../infrastructure/s3';
 import path from 'path';
 import { v4 } from 'uuid';

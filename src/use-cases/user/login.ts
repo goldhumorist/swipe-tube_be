@@ -6,7 +6,7 @@ import {
 import { ERROR_CODE, Exception } from '../../global-help-utils/';
 import { NotFoundX } from './../../domain-model/domain-model-exception';
 import { IUser, User } from './../../domain-model/user.model';
-import UseCaseBase from '../../base';
+import UseCaseBase from '../base';
 import jwtUtils from '../utils/jwt';
 
 export default class UserLogin extends UseCaseBase<

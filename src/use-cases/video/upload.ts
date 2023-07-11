@@ -6,7 +6,7 @@ import {
 } from './../interface';
 import { loggerFactory } from './../../infrastructure/logger';
 import { IUploadVideoParams } from '../interface';
-import UseCaseBase from '../../base';
+import UseCaseBase from '../base';
 import { s3Client } from './../../infrastructure/s3';
 import { v4 as uuidV4 } from 'uuid';
 import path from 'path';

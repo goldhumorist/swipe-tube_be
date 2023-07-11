@@ -6,7 +6,7 @@ import {
   IMyVideosFullResponse,
   IMyVideosDumpedResponse,
 } from '../interface';
-import UseCaseBase from '../../base';
+import UseCaseBase from '../base';
 
 const logger = loggerFactory.getLogger(__filename);
 

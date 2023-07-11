@@ -1,7 +1,7 @@
 import { ERROR_CODE } from '../../global-help-utils/enums';
 import { Exception } from '../../global-help-utils/exception';
 import { IUser, User } from '../../domain-model/user.model';
-import UseCaseBase from '../../base';
+import UseCaseBase from '../base';
 import {
   ISessionCheckParams,
   ISessionFullResponse,
