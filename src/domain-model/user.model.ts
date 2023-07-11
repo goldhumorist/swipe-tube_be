@@ -12,10 +12,12 @@ import {
   CreatedAt,
   UpdatedAt,
   BeforeCreate,
+  HasMany,
 } from 'sequelize-typescript';
 import { Base } from './base';
 import bcrypt from 'bcrypt';
 import { NotFoundX } from './domain-model-exception';
+import { Video } from './video.model';
 
 export interface IUser {
   id?: number;
@@ -73,6 +75,9 @@ export class User extends Base<IUser> {
   @Column({ type: DataType.DATE, field: 'updated_at' })
   @UpdatedAt
   updatedAt: Date;
+
+  @HasMany(() => Video)
+  videos: Video[];
 
   static async findByEmail(email: string) {
     const user: IUser | null = await User.findOne({ where: { email } });

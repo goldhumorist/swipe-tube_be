@@ -12,14 +12,16 @@ export interface ISessionFullResponse {
   data: ISessionDumpedResponse;
 }
 
+export interface IFile {
+  buffer: Buffer;
+  originalname: string;
+  size: string;
+  encoding: string;
+  mimetype: string;
+}
+
 export interface IUserSignupParams {
-  file: {
-    buffer: Buffer;
-    originalname: string;
-    size: string;
-    encoding: string;
-    mimetype: string;
-  };
+  file: IFile;
   username: string;
   email: string;
   password: string;
@@ -54,14 +56,45 @@ export interface IUserLoginParams {
   password: string;
 }
 
-export interface IListVideosParams {
-  mock: string;
+export interface IMyVideosParams {
+  userId: number;
+  page: number;
+  limit: number;
 }
 
-export interface IListVideosResponse {
-  mock: string;
+export interface IMyVideosDumpedResponse {
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalRows: number;
+  };
+  videos: Array<{
+    videoUrlPath: string;
+    thumbnailUrlPath: string;
+    description?: string | null;
+  }>;
+}
+
+export interface IMyVideosFullResponse {
+  data: IMyVideosDumpedResponse;
 }
 
 export interface IUserJWTPayload {
   userId: number;
+}
+
+export interface IUploadVideoParams {
+  file: IFile;
+  description: string;
+  userId: number;
+}
+
+export interface IUploadVideoDumpedResponse {
+  videoUrlPath: string;
+  thumbnailUrlPath: string;
+  description?: string;
+}
+
+export interface IUploadVideoFullResponse {
+  data: IUploadVideoDumpedResponse;
 }
