@@ -6,12 +6,7 @@ COPY package*.json ./
 
 RUN npm ci
 
-COPY ./src ./src
-COPY ./tsconfig.json .
-COPY ./migrations ./migrations
-COPY ./config ./config
-COPY ./.env .
-COPY ./.sequelizerc .
+COPY . .
 
 RUN npm run build
 
