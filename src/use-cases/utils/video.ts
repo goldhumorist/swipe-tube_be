@@ -46,7 +46,7 @@ export default class VideoService {
     let thumbnailBuffer: Buffer | undefined;
 
     await new Promise<void>((resolve, reject) => {
-      this.ffmpegInstance
+      ffmpeg()
         .input(videoFilePath)
         .output(thumbnailFilePath)
         .seekInput(this.thumbnailConfig.timingForThumbnail)
