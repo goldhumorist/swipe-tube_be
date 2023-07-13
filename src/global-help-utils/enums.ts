@@ -8,4 +8,19 @@ export enum ERROR_CODE {
   NOT_FOUND = 'NOT_FOUND',
   SERVER_ERROR = 'SERVER_ERROR',
   NOT_UNIQUE = 'NOT_UNIQUE',
+  FILE_IS_NOT_ALLOWED = 'FILE IS NOT ALLOWED',
+}
+
+export const AVAILIBLE_IMAGE_EXTENTION = ['.jpeg', '.jpg', '.png'];
+export const AVAILIBLE_VIDEO_EXTENTION = ['.mp4'];
+
+export enum FILE_SIZE_LIMIT {
+  THREE_MEGABYTES = 3 * 1024 * 1024,
+  TEN_MEGABYTES = 10 * 1024 * 1024,
+}
+
+export enum FILES_PREFIX {
+  PROFILE_IMAGE = 'profile_image',
+  VIDEO = 'video',
+  THUMBNAIL = 'thumbnail',
 }

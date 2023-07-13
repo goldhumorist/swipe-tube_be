@@ -6,6 +6,7 @@ const router = express.Router();
 
 const checkSession = sessionController.session.checkSessionMiddleware;
 
-router.get('/list', checkSession, controllers.videos.list);
+router.get('/my-videos', checkSession, controllers.videos.myVideos);
+router.post('/upload', checkSession, controllers.videos.uploadVideo);
 
 export default router;

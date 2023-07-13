@@ -4,7 +4,7 @@
 
 import { Exception, ERROR_CODE } from '../../global-help-utils';
 import { loggerFactory } from '../../infrastructure/logger';
-import UseCaseBase from '../../base';
+import UseCaseBase from '../../use-cases/base';
 import { Request, Response } from 'express';
 import { IRequest } from '../rest-api/interfaces';
 

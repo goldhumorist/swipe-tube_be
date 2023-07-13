@@ -1,15 +1,26 @@
-import { ERROR_CODE } from '../../../../global-help-utils/enums';
+import { filterFileType } from './../../../utils';
+import {
+  AVAILIBLE_IMAGE_EXTENTION,
+  ERROR_CODE,
+  FILE_SIZE_LIMIT,
+} from '../../../../global-help-utils/enums';
 import { Request, Response } from 'express';
 import { loggerFactory } from '../../../../infrastructure/logger';
-import multer from 'multer';
+import multer, { MulterError } from 'multer';
 import { chista } from '../../../utils';
 import UserSignup from '../../../../use-cases/user/signup';
 import UserLogin from '../../../../use-cases/user/login';
 
 const logger = loggerFactory.getLogger(__filename);
-const upload = multer({ limits: { fileSize: 3000000 } });
+
+const upload = multer({
+  limits: { fileSize: FILE_SIZE_LIMIT.THREE_MEGABYTES },
+  fileFilter: filterFileType(AVAILIBLE_IMAGE_EXTENTION),
+});
 
 export default {
+  login: chista.makeUseCaseRunner(UserLogin, (req: Request) => req.body),
+
   signup: async (req: Request, res: Response) => {
     try {
       await new Promise<void>((resolve, reject) => {
@@ -24,7 +35,6 @@ export default {
         params: {
           ...req.body,
           file,
-          mimetype: file?.mimetype,
         },
       });
 
@@ -36,15 +46,14 @@ export default {
         status: 0,
         error: {
           code: ERROR_CODE.SERVER_ERROR,
-          message: error.message,
+          message: error.message || error.code,
         },
       };
 
-      if (error instanceof multer.MulterError)
+      if (error instanceof MulterError)
         errorResponse.error.code = ERROR_CODE.BAD_REQUEST;
 
       res.send(errorResponse);
     }
   },
-  login: chista.makeUseCaseRunner(UserLogin, (req: Request) => req.body),
 };
