@@ -81,6 +81,7 @@ export class Video extends Base<IVideo> {
 
     const videos = await Video.findAndCountAll({
       where: { authorId: userId },
+      order: [['createdAt', 'DESC']],
       limit,
       offset,
     });
