@@ -15,7 +15,12 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 import { Base } from './base';
-import { IListMyVideosData, IMyVideosResponse } from './interfaces';
+import {
+  IListMyVideosData,
+  IMyVideosResponse,
+  ISwipeVideosData,
+} from './interfaces';
+import { Op } from 'sequelize';
 
 export interface IVideo {
   id?: number;
@@ -83,6 +88,29 @@ export class Video extends Base<IVideo> {
       where: { authorId: userId },
       order: [['createdAt', 'DESC']],
       limit,
+      offset,
+    });
+
+    return {
+      videos: videos.rows,
+      pagination: {
+        page,
+        pageSize: videos.rows.length,
+        totalRows: videos.count,
+      },
+    };
+  }
+
+  static async listVideosForSwipe(
+    data: ISwipeVideosData,
+  ): Promise<IMyVideosResponse> {
+    const { userId, page, mainLimit, itemLimit } = data;
+
+    const offset = mainLimit * page - mainLimit;
+
+    const videos = await Video.findAndCountAll({
+      where: { authorId: { [Op.not]: userId } },
+      limit: itemLimit,
       offset,
     });
 

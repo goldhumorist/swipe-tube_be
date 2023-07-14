@@ -79,6 +79,19 @@ export interface IMyVideosFullResponse {
   data: IMyVideosDumpedResponse;
 }
 
+export interface ISwipeVideosParams {
+  userId: number;
+  page: number;
+  mainLimit: number;
+  itemLimit: number;
+}
+
+export type ISwipeVideosDumpedResponse = IMyVideosDumpedResponse;
+
+export interface ISwipeVideosFullResponse {
+  data: ISwipeVideosDumpedResponse;
+}
+
 export interface IUserJWTPayload {
   userId: number;
 }

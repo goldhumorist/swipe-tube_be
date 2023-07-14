@@ -15,8 +15,17 @@ export interface IMyVideosResponse {
   };
 }
 
+export type ISwipeVideosResponse = IMyVideosResponse;
+
 export interface IListMyVideosData {
   userId: number;
   page: number;
   limit: number;
+}
+
+export interface ISwipeVideosData {
+  userId: number;
+  page: number;
+  mainLimit: number;
+  itemLimit: number;
 }
