@@ -4,7 +4,7 @@ import UploadVideo from '../../../../use-cases/video/upload';
 import SwipeVideos from '../../../../use-cases/video/swipe-videos';
 import { chista } from '../../../utils';
 import {
-  AVAILIBLE_VIDEO_EXTENTION,
+  AVAILABLE_VIDEO_MIMETYPES,
   ERROR_CODE,
   FILE_SIZE_LIMIT,
 } from '../../../../global-help-utils/enums';
@@ -17,7 +17,7 @@ const logger = loggerFactory.getLogger(__filename);
 
 const upload = multer({
   limits: { fileSize: FILE_SIZE_LIMIT.TEN_MEGABYTES },
-  fileFilter: filterFileType(AVAILIBLE_VIDEO_EXTENTION),
+  fileFilter: filterFileType(AVAILABLE_VIDEO_MIMETYPES),
 });
 
 export default {

@@ -1,6 +1,6 @@
 import { filterFileType } from './../../../utils';
 import {
-  AVAILIBLE_IMAGE_EXTENTION,
+  AVAILABLE_IMAGE_MIMETYPES,
   ERROR_CODE,
   FILE_SIZE_LIMIT,
 } from '../../../../global-help-utils/enums';
@@ -15,7 +15,7 @@ const logger = loggerFactory.getLogger(__filename);
 
 const upload = multer({
   limits: { fileSize: FILE_SIZE_LIMIT.THREE_MEGABYTES },
-  fileFilter: filterFileType(AVAILIBLE_IMAGE_EXTENTION),
+  fileFilter: filterFileType(AVAILABLE_IMAGE_MIMETYPES),
 });
 
 export default {
