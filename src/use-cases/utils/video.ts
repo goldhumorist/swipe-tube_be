@@ -55,12 +55,14 @@ export default class VideoService {
         .on('end', () => resolve())
         .on('error', error => reject(error))
         .run();
-    }).finally(async () => {
-      thumbnailBuffer = await fs.readFile(thumbnailFilePath);
-
-      await this.removeFile(videoFilePath);
-      await this.removeFile(thumbnailFilePath);
-    });
+    })
+      .then(
+        async () => (thumbnailBuffer = await fs.readFile(thumbnailFilePath)),
+      )
+      .finally(async () => {
+        await this.removeFile(videoFilePath);
+        await this.removeFile(thumbnailFilePath);
+      });
 
     return thumbnailBuffer as Buffer;
   }

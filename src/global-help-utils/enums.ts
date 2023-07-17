@@ -11,8 +11,12 @@ export enum ERROR_CODE {
   FILE_IS_NOT_ALLOWED = 'FILE IS NOT ALLOWED',
 }
 
-export const AVAILIBLE_IMAGE_EXTENTION = ['.jpeg', '.jpg', '.png'];
-export const AVAILIBLE_VIDEO_EXTENTION = ['.mp4'];
+export const AVAILABLE_IMAGE_MIMETYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+];
+export const AVAILABLE_VIDEO_MIMETYPES = ['video/mp4'];
 
 export enum FILE_SIZE_LIMIT {
   THREE_MEGABYTES = 3 * 1024 * 1024,
