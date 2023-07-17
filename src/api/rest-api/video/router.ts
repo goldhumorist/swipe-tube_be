@@ -7,6 +7,7 @@ const router = express.Router();
 const checkSession = sessionController.session.checkSessionMiddleware;
 
 router.get('/my-videos', checkSession, controllers.videos.myVideos);
+router.get('/swipe-videos', checkSession, controllers.videos.swipeVideos);
 router.post('/upload', checkSession, controllers.videos.uploadVideo);
 
 export default router;
