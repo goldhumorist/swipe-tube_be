@@ -7,11 +7,6 @@ module.exports = {
     await queryInterface.createTable(
       { tableName: 'video-views', schema },
       {
-        id: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
         author_id: {
           type: Sequelize.INTEGER,
           allowNull: false,

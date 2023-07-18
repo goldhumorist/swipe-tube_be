@@ -14,9 +14,9 @@ import {
 } from 'sequelize-typescript';
 import { Base } from './base';
 import { Video } from './video.model';
+import { NotUniqueX } from './domain-model-exception';
 
 export interface IVideoViews {
-  id?: number;
   authorId: number;
   videoId: number;
   createdAt?: Date;
@@ -29,12 +29,6 @@ export interface IVideoViews {
   timestamps: false,
 })
 export class VideoViews extends Base<IVideoViews> {
-  @PrimaryKey
-  @AllowNull(false)
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  id: number;
-
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column({ type: DataType.INTEGER, field: 'author_id' })
@@ -57,10 +51,29 @@ export class VideoViews extends Base<IVideoViews> {
   @UpdatedAt
   updatedAt: Date;
 
+  static async addViewForVideo(
+    authorId: number,
+    videoId: number,
+  ): Promise<IVideoViews> {
+    const [videoViews, isCreated] = await VideoViews.findOrCreate({
+      where: { authorId, videoId },
+      defaults: { authorId, videoId },
+    });
+
+    if (!isCreated) {
+      throw new NotUniqueX({
+        message: `User - ${authorId} has already viewed video - ${videoId}`,
+        field: 'AuthorId',
+      });
+    }
+
+    return videoViews;
+  }
+
   static async countViews(videoId: number) {
-    const views = await VideoViews.count({
+    const viewsAmount = await VideoViews.count({
       where: { videoId },
     });
-    return { views };
+    return viewsAmount;
   }
 }

@@ -7,6 +7,8 @@ import {
   IVideoViewsParams,
 } from '../interface';
 import UseCaseBase from '../base';
+import { NotUniqueX } from '../../domain-model/domain-model-exception';
+import { ERROR_CODE, Exception } from '../../global-help-utils';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -20,23 +22,32 @@ export default class SwipeVideosViews extends UseCaseBase<
   };
 
   async execute(data: IVideoViewsParams): Promise<IVideoViewsFullResponse> {
-    const { videoId, userId } = data;
+    try {
+      const { videoId, userId } = data;
 
-    const videoViews = await VideoViews.create({
-      authorId: userId,
-      videoId: videoId,
-    });
+      const videoViews = await VideoViews.addViewForVideo(userId, videoId);
 
-    const { views } = await VideoViews.countViews(videoId);
+      const viewsAmount = await VideoViews.countViews(videoId);
 
-    await VideoStatistic.updateStatistic(videoId, views);
+      await VideoStatistic.updateStatistic(videoId, viewsAmount);
 
-    return {
-      data: {
+      const result = {
         ...this.dumpVideoViews(videoViews),
-        views: views,
-      },
-    };
+        views: viewsAmount,
+      };
+
+      return {
+        data: result,
+      };
+    } catch (error: any) {
+      if (error instanceof NotUniqueX)
+        throw new Exception({
+          code: ERROR_CODE.NOT_UNIQUE,
+          message: error.message,
+        });
+
+      throw error;
+    }
   }
 
   dumpVideoViews(videoViews: IVideoViews): IVideoViewsDumpedResponse {
