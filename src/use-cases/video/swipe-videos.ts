@@ -38,6 +38,10 @@ export default class SwipeVideos extends UseCaseBase<
           videoUrlPath: video.videoUrlPath,
           thumbnailUrlPath: video.thumbnailUrlPath,
           description: video.description,
+          statistic: {
+            views: video.videoStatistic?.viewsAmount,
+            likes: video.videoStatistic?.likesAmount,
+          },
         };
       }),
     };

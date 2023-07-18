@@ -1,4 +1,3 @@
-import { User } from './user.model';
 import { config } from '../config';
 import {
   Table,
@@ -11,39 +10,49 @@ import {
   CreatedAt,
   UpdatedAt,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Base } from './base';
 import { Video } from './video.model';
 
-export interface IVideoViews {
+export interface IVideoStatistic {
   id?: number;
-  authorId: number;
   videoId: number;
+  viewsAmount?: number;
+  likesAmount?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 @Table({
-  tableName: 'video-views',
+  tableName: 'video-statistic',
   schema: config.database.schema,
   timestamps: false,
 })
-export class VideoViews extends Base<IVideoViews> {
+export class VideoStatistic extends Base<IVideoStatistic> {
   @PrimaryKey
   @AllowNull(false)
   @AutoIncrement
   @Column(DataType.INTEGER)
   id: number;
 
-  @ForeignKey(() => User)
-  @AllowNull(false)
-  @Column({ type: DataType.INTEGER, field: 'author_id' })
-  authorId: number;
-
   @ForeignKey(() => Video)
   @AllowNull(false)
   @Column({ type: DataType.INTEGER, field: 'video_id' })
   videoId: number;
+
+  @AllowNull(false)
+  @Default(0)
+  @Column({ type: DataType.INTEGER, field: 'likes_amount' })
+  likesAmount: number;
+
+  @AllowNull(false)
+  @Default(0)
+  @Column({ type: DataType.INTEGER, field: 'views_amount' })
+  viewsAmount: number;
+
+  @BelongsTo(() => Video)
+  video: Video;
 
   @AllowNull(false)
   @Default(DataType.NOW())
@@ -57,10 +66,7 @@ export class VideoViews extends Base<IVideoViews> {
   @UpdatedAt
   updatedAt: Date;
 
-  static async countViews(videoId: number) {
-    const views = await VideoViews.count({
-      where: { videoId },
-    });
-    return { views };
+  static async updateStatistic(videoId: number, viewsAmount: number) {
+    await VideoStatistic.update({ viewsAmount }, { where: { videoId } });
   }
 }

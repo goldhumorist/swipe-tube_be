@@ -6,16 +6,33 @@ export interface IDMExceptionData {
   parent?: Error;
 }
 
-export interface IMyVideosResponse {
-  videos: Array<IVideo>;
-  pagination: {
-    page: number;
-    pageSize: number;
-    totalRows: number;
-  };
+export interface IVideoStatistic {
+  likesAmount: number;
+  viewsAmount: number;
 }
 
-export type ISwipeVideosResponse = IMyVideosResponse;
+export interface IVideoPagination {
+  page: number;
+  pageSize: number;
+  totalRows: number;
+}
+
+export interface IMyVideosResponse {
+  videos: Array<IVideo>;
+  pagination: IVideoPagination;
+}
+
+export interface ISwipeVideosResponse {
+  videos: Array<IVideoMetaRecord>;
+  pagination: IVideoPagination;
+}
+
+export type IVideoMetaRecord = IVideo & { videoStatistic: IVideoStatistic };
+
+export type ISwipeVideoQueryResponse = {
+  rows: Array<IVideoMetaRecord>;
+  count: number;
+};
 
 export interface IListMyVideosData {
   userId: number;

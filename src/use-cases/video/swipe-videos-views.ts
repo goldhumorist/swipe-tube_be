@@ -1,3 +1,4 @@
+import { VideoStatistic } from './../../domain-model/video-statistic.model';
 import { IVideoViews, VideoViews } from '../../domain-model/video-views.model';
 import { loggerFactory } from '../../infrastructure/logger';
 import {
@@ -19,12 +20,16 @@ export default class SwipeVideosViews extends UseCaseBase<
   };
 
   async execute(data: IVideoViewsParams): Promise<IVideoViewsFullResponse> {
+    const { videoId, userId } = data;
+
     const videoViews = await VideoViews.create({
-      authorId: data.userId,
-      videoId: data.videoId,
+      authorId: userId,
+      videoId: videoId,
     });
 
-    const { views } = await VideoViews.countViews(data.videoId);
+    const { views } = await VideoViews.countViews(videoId);
+
+    await VideoStatistic.updateStatistic(videoId, views);
 
     return {
       data: {
