@@ -34,6 +34,7 @@ export default class SwipeVideos extends UseCaseBase<
       pagination: pagination,
       videos: videos.map(video => {
         return {
+          videoId: video.id,
           videoUrlPath: video.videoUrlPath,
           thumbnailUrlPath: video.thumbnailUrlPath,
           description: video.description,

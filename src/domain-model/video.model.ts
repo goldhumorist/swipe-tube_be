@@ -13,6 +13,7 @@ import {
   UpdatedAt,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { Base } from './base';
 import {
@@ -21,6 +22,7 @@ import {
   ISwipeVideosData,
 } from './interfaces';
 import { Op } from 'sequelize';
+import { VideoViews } from './video-views.model';
 
 export interface IVideo {
   id?: number;
@@ -64,6 +66,9 @@ export class Video extends Base<IVideo> {
   @AllowNull(false)
   @Column({ type: DataType.STRING, field: 'thumbnail_url_path' })
   thumbnailUrlPath: string;
+
+  @BelongsToMany(() => User, () => VideoViews)
+  userViews: Array<User & { VideoViews: VideoViews }>;
 
   @AllowNull(false)
   @Default(DataType.NOW())

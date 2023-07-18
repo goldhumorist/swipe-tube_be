@@ -56,6 +56,22 @@ export interface IUserLoginParams {
   password: string;
 }
 
+export interface IVideoViewsParams {
+  userId: number;
+  videoId: number;
+}
+export interface IVideoViewsFullResponse {
+  data: {
+    views: number;
+    userId: number;
+    videoId: number;
+  };
+}
+
+export interface IVideoViewsDumpedResponse {
+  userId: number;
+  videoId: number;
+}
 export interface IMyVideosParams {
   userId: number;
   page: number;
@@ -86,7 +102,19 @@ export interface ISwipeVideosParams {
   itemLimit: number;
 }
 
-export type ISwipeVideosDumpedResponse = IMyVideosDumpedResponse;
+export interface ISwipeVideosDumpedResponse {
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalRows: number;
+  };
+  videos: Array<{
+    videoId?: number;
+    videoUrlPath: string;
+    thumbnailUrlPath: string;
+    description?: string | null;
+  }>;
+}
 
 export interface ISwipeVideosFullResponse {
   data: ISwipeVideosDumpedResponse;
