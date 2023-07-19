@@ -1,3 +1,4 @@
+import { Database } from './../../domain-model/index';
 import { IVideo, Video } from './../../domain-model/video.model';
 import { FILES_PREFIX } from './../../global-help-utils/enums';
 import {
@@ -28,9 +29,7 @@ export default class UploadVideo extends UseCaseBase<
   async execute(data: IUploadVideoParams): Promise<IUploadVideoFullResponse> {
     const { file: video, userId, description } = data;
 
-    let savedVideo: Video | null = null;
-
-    let videoStatistic: VideoStatistic | null = null;
+    const transaction = await Database.getInstance().transaction();
 
     try {
       const v4 = uuidV4();
@@ -46,16 +45,22 @@ export default class UploadVideo extends UseCaseBase<
         },
       );
 
-      savedVideo = await Video.create({
-        authorId: userId,
-        description,
-        videoUrlPath: videoFileName,
-        thumbnailUrlPath: thumbnailFileName,
-      });
+      const savedVideo = await Video.create(
+        {
+          authorId: userId,
+          description,
+          videoUrlPath: videoFileName,
+          thumbnailUrlPath: thumbnailFileName,
+        },
+        { transaction },
+      );
 
-      videoStatistic = await VideoStatistic.create({
-        videoId: savedVideo.id,
-      });
+      await VideoStatistic.create(
+        {
+          videoId: savedVideo.id,
+        },
+        { transaction },
+      );
 
       await s3Client.uploadFileToS3({
         key: videoFileName,
@@ -69,11 +74,11 @@ export default class UploadVideo extends UseCaseBase<
         contentType: 'image/jpg',
       });
 
+      await transaction.commit();
+
       return { data: this.dumpVideo(savedVideo) };
     } catch (error) {
-      await savedVideo?.destroyInstance();
-
-      await videoStatistic?.destroyInstance();
+      await transaction.rollback();
 
       throw error;
     }
