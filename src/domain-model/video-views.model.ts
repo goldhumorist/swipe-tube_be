@@ -4,9 +4,7 @@ import {
   Table,
   Column,
   DataType,
-  PrimaryKey,
   AllowNull,
-  AutoIncrement,
   Default,
   CreatedAt,
   UpdatedAt,
@@ -15,6 +13,7 @@ import {
 import { Base } from './base';
 import { Video } from './video.model';
 import { NotUniqueX } from './domain-model-exception';
+import { Transaction } from 'sequelize';
 
 export interface IVideoViews {
   authorId: number;
@@ -52,12 +51,18 @@ export class VideoViews extends Base<IVideoViews> {
   updatedAt: Date;
 
   static async addViewForVideo(
-    authorId: number,
-    videoId: number,
+    data: {
+      authorId: number;
+      videoId: number;
+    },
+    transaction?: Transaction,
   ): Promise<IVideoViews> {
+    const { authorId, videoId } = data;
+
     const [videoViews, isCreated] = await VideoViews.findOrCreate({
       where: { authorId, videoId },
       defaults: { authorId, videoId },
+      transaction,
     });
 
     if (!isCreated) {
@@ -68,12 +73,5 @@ export class VideoViews extends Base<IVideoViews> {
     }
 
     return videoViews;
-  }
-
-  static async countViews(videoId: number) {
-    const viewsAmount = await VideoViews.count({
-      where: { videoId },
-    });
-    return viewsAmount;
   }
 }

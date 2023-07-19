@@ -14,6 +14,7 @@ import {
 } from 'sequelize-typescript';
 import { Base } from './base';
 import { Video } from './video.model';
+import { Sequelize, Transaction } from 'sequelize';
 
 export interface IVideoStatistic {
   id?: number;
@@ -66,7 +67,19 @@ export class VideoStatistic extends Base<IVideoStatistic> {
   @UpdatedAt
   updatedAt: Date;
 
-  static async updateStatistic(videoId: number, viewsAmount: number) {
-    await VideoStatistic.update({ viewsAmount }, { where: { videoId } });
+  static async incrementVideoViews(
+    videoId: number,
+    transaction?: Transaction,
+  ): Promise<number> {
+    const [_, [updatedRow]] = await VideoStatistic.update(
+      { viewsAmount: Sequelize.literal(`views_amount + 1`) },
+      {
+        where: { videoId },
+        returning: true,
+        transaction,
+      },
+    );
+
+    return updatedRow.viewsAmount;
   }
 }
