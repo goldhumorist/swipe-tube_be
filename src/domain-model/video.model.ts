@@ -13,14 +13,20 @@ import {
   UpdatedAt,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
+  HasOne,
 } from 'sequelize-typescript';
 import { Base } from './base';
 import {
   IListMyVideosData,
   IMyVideosResponse,
+  ISwipeVideoQueryResponse,
   ISwipeVideosData,
+  ISwipeVideosResponse,
 } from './interfaces';
 import { Op } from 'sequelize';
+import { VideoViews } from './video-views.model';
+import { VideoStatistic } from './video-statistic.model';
 
 export interface IVideo {
   id?: number;
@@ -65,6 +71,12 @@ export class Video extends Base<IVideo> {
   @Column({ type: DataType.STRING, field: 'thumbnail_url_path' })
   thumbnailUrlPath: string;
 
+  @BelongsToMany(() => User, () => VideoViews)
+  userViews: Array<User & { VideoViews: VideoViews }>;
+
+  @HasOne(() => VideoStatistic)
+  videoStatistic: VideoStatistic;
+
   @AllowNull(false)
   @Default(DataType.NOW())
   @Column({ type: DataType.DATE, field: 'created_at' })
@@ -103,16 +115,22 @@ export class Video extends Base<IVideo> {
 
   static async listVideosForSwipe(
     data: ISwipeVideosData,
-  ): Promise<IMyVideosResponse> {
+  ): Promise<ISwipeVideosResponse> {
     const { userId, page, mainLimit, itemLimit } = data;
 
     const offset = mainLimit * page - mainLimit;
 
-    const videos = await Video.findAndCountAll({
+    const videos = (await Video.findAndCountAll({
       where: { authorId: { [Op.not]: userId } },
+      include: [
+        {
+          model: VideoStatistic,
+          attributes: { exclude: ['id', 'videoId', 'createdAt', 'updatedAt'] },
+        },
+      ],
       limit: itemLimit,
       offset,
-    });
+    })) as ISwipeVideoQueryResponse;
 
     return {
       videos: videos.rows,

@@ -2,6 +2,7 @@ import { filterFileType } from './../../../utils';
 import MyVideos from '../../../../use-cases/video/my-videos';
 import UploadVideo from '../../../../use-cases/video/upload';
 import SwipeVideos from '../../../../use-cases/video/swipe-videos';
+import AddSwipeVideosView from '../../../../use-cases/video/add-swipe-videos-view';
 import { chista } from '../../../utils';
 import {
   AVAILABLE_VIDEO_MIMETYPES,
@@ -25,6 +26,14 @@ export default {
     ...req.session?.context,
     ...req.query,
   })),
+
+  addVideoView: chista.makeUseCaseRunner(
+    AddSwipeVideosView,
+    (req: IRequest) => ({
+      ...req.session?.context,
+      ...req.body,
+    }),
+  ),
 
   swipeVideos: chista.makeUseCaseRunner(SwipeVideos, (req: IRequest) => ({
     ...req.session?.context,

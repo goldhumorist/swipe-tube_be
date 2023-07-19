@@ -1,9 +1,12 @@
+import { IVideoPagination } from './../domain-model/interfaces';
+
 export interface ISessionDumpedResponse {
   userId?: number;
   email: string;
   username: string;
   avatarUrlPath?: string | null;
 }
+
 export interface ISessionCheckParams {
   token: string;
 }
@@ -56,6 +59,24 @@ export interface IUserLoginParams {
   password: string;
 }
 
+export interface IVideoViewsParams {
+  userId: number;
+  videoId: number;
+}
+
+export interface IVideoViewsFullResponse {
+  data: {
+    views: number;
+    userId: number;
+    videoId: number;
+  };
+}
+
+export interface IVideoViewsDumpedResponse {
+  userId: number;
+  videoId: number;
+}
+
 export interface IMyVideosParams {
   userId: number;
   page: number;
@@ -86,7 +107,21 @@ export interface ISwipeVideosParams {
   itemLimit: number;
 }
 
-export type ISwipeVideosDumpedResponse = IMyVideosDumpedResponse;
+export interface ISwipeVideosDumpedData {
+  videoId?: number;
+  videoUrlPath: string;
+  thumbnailUrlPath: string;
+  description?: string | null;
+  statistic: {
+    views: number;
+    likes: number;
+  };
+}
+
+export interface ISwipeVideosDumpedResponse {
+  pagination: IVideoPagination;
+  videos: Array<ISwipeVideosDumpedData>;
+}
 
 export interface ISwipeVideosFullResponse {
   data: ISwipeVideosDumpedResponse;

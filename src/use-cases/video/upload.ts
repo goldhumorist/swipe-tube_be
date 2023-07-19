@@ -11,6 +11,7 @@ import { s3Client } from './../../infrastructure/s3';
 import { v4 as uuidV4 } from 'uuid';
 import path from 'path';
 import { videoService } from '../utils/video';
+import { VideoStatistic } from './../../domain-model/video-statistic.model';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -28,6 +29,8 @@ export default class UploadVideo extends UseCaseBase<
     const { file: video, userId, description } = data;
 
     let savedVideo: Video | null = null;
+
+    let videoStatistic: VideoStatistic | null = null;
 
     try {
       const v4 = uuidV4();
@@ -50,6 +53,10 @@ export default class UploadVideo extends UseCaseBase<
         thumbnailUrlPath: thumbnailFileName,
       });
 
+      videoStatistic = await VideoStatistic.create({
+        videoId: savedVideo.id,
+      });
+
       await s3Client.uploadFileToS3({
         key: videoFileName,
         body: video.buffer,
@@ -65,6 +72,8 @@ export default class UploadVideo extends UseCaseBase<
       return { data: this.dumpVideo(savedVideo) };
     } catch (error) {
       await savedVideo?.destroyInstance();
+
+      await videoStatistic?.destroyInstance();
 
       throw error;
     }
