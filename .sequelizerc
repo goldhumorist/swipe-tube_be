@@ -4,4 +4,5 @@ const config = require('config');
 module.exports = {
   config: path.resolve(`./config`, 'config.js'),
   'migrations-path': './migrations',
+  'seeders-path': './seeders',
 };

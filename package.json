@@ -11,6 +11,8 @@
     "lint": "eslint src/**/*.ts --fix",
     "format": "prettier --write ./src",
     "migrate": "npx sequelize-cli db:migrate",
+    "seed": "npx sequelize seed:generate --name",
+    "seed:generate":"npx sequelize db:seed:all",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "test:audit": "npm audit",
     "prepare": "husky install"

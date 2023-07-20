@@ -49,6 +49,7 @@ Before running router to be sure that all services are running via docker-compos
 | DB_PASSWORD            | YES         | database password                    | postgres                      |
 | DB_DIALECT             | YES         | database type                        | postgres                      |
 | DB_SCHEMA              | YES         | database schema                      | config                        |
+| DB_SEEDER_STORAGE      | YES         | seeders storage                      | sequelize                     |
 | ALLOW_CONFIG_MUTATIONS | YES         | configuration for migrations         | true                          |
 |                        |             |                                      |                               |
 | #S3                    |             |                                      |                               |
