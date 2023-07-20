@@ -15,6 +15,7 @@ module.exports = {
     password: process.env.DB_PASSWORD,
     dialect: process.env.DB_DIALECT,
     schema: process.env.DB_SCHEMA,
+    seederStorage: process.env.DB_SEEDER_STORAGE,
   },
   S3: {
     accessKeyId: process.env.S3_ACCESS_KEY,

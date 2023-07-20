@@ -13,6 +13,7 @@ interface IConfig {
     password: string;
     dialect: string;
     schema: string;
+    seederStorage: string;
   };
   S3: {
     accessKeyId: string;

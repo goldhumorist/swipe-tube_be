@@ -6,8 +6,16 @@ import { Dialect } from 'sequelize';
 
 const logger = loggerFactory.getLogger(__filename);
 
-const { database, password, dialect, username, schema, port, host } =
-  config.database;
+const {
+  database,
+  password,
+  dialect,
+  username,
+  schema,
+  port,
+  host,
+  seederStorage,
+} = config.database;
 
 export class Database {
   private static dbInstance: Sequelize;
