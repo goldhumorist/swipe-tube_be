@@ -15,12 +15,14 @@ import {
 import { Base } from './base';
 import { Video } from './video.model';
 import { Sequelize, Transaction } from 'sequelize';
+import { IUpdateVideoLikesParams, VideoLikesActionEnum } from './interfaces';
 
 export interface IVideoStatistic {
   id?: number;
   videoId: number;
   viewsAmount?: number;
   likesAmount?: number;
+  dislikesAmount?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -46,6 +48,11 @@ export class VideoStatistic extends Base<IVideoStatistic> {
   @Default(0)
   @Column({ type: DataType.INTEGER, field: 'likes_amount' })
   likesAmount: number;
+
+  @AllowNull(false)
+  @Default(0)
+  @Column({ type: DataType.INTEGER, field: 'dislikes_amount' })
+  dislikesAmount: number;
 
   @AllowNull(false)
   @Default(0)
@@ -81,5 +88,37 @@ export class VideoStatistic extends Base<IVideoStatistic> {
     );
 
     return updatedRow.viewsAmount;
+  }
+
+  static async updateVideoLikes(
+    params: IUpdateVideoLikesParams,
+    videoId: number,
+    transaction?: Transaction,
+  ): Promise<IVideoStatistic> {
+    const { like, dislike } = params;
+
+    const updateParams = {
+      likesAmount:
+        like === VideoLikesActionEnum.increase
+          ? Sequelize.literal(`likes_amount + 1`)
+          : Sequelize.literal(
+              'CASE WHEN likes_amount > 0 THEN likes_amount - 1 ELSE 0 END',
+            ),
+
+      dislikesAmount:
+        dislike === VideoLikesActionEnum.increase
+          ? Sequelize.literal(`dislikes_amount + 1`)
+          : Sequelize.literal(
+              'CASE WHEN dislikes_amount > 0 THEN dislikes_amount - 1 ELSE 0 END',
+            ),
+    };
+
+    const [_, [updatedRow]] = await VideoStatistic.update(updateParams, {
+      where: { videoId },
+      returning: true,
+      transaction,
+    });
+
+    return updatedRow as IVideoStatistic;
   }
 }

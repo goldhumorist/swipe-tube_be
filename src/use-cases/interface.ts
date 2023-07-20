@@ -1,3 +1,5 @@
+import { IVideoStatistic } from './../domain-model/video-statistic.model';
+import { VideoReactionsEnum } from './../domain-model/video-reactions.model';
 import { IVideoPagination } from './../domain-model/interfaces';
 
 export interface ISessionDumpedResponse {
@@ -145,4 +147,27 @@ export interface IUploadVideoDumpedResponse {
 
 export interface IUploadVideoFullResponse {
   data: IUploadVideoDumpedResponse;
+}
+
+export interface IUpdateVideoReactionParams {
+  userId: number;
+  videoId: number;
+  reaction: VideoReactionsEnum;
+}
+
+export interface IUpdateVideoReactionDumped {
+  userId: number;
+  videoId: number;
+  likes?: number;
+  dislikes?: number;
+}
+
+export interface IUpdateVideoReactionDataToDump {
+  userId: number;
+  videoId: number;
+  videoStatistic: IVideoStatistic;
+}
+
+export interface IUpdateVideoReactionFullResponse {
+  data: IUpdateVideoReactionDumped;
 }

@@ -10,5 +10,10 @@ router.get('/my-videos', checkSession, controllers.videos.myVideos);
 router.get('/swipe-videos', checkSession, controllers.videos.swipeVideos);
 router.post('/upload', checkSession, controllers.videos.uploadVideo);
 router.post('/add-video-view', checkSession, controllers.videos.addVideoView);
+router.post(
+  '/update-video-reaction',
+  checkSession,
+  controllers.videos.updateVideoReaction,
+);
 
 export default router;
