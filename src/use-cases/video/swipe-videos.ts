@@ -41,6 +41,12 @@ export default class SwipeVideos extends UseCaseBase<
           statistic: {
             views: video.videoStatistic?.viewsAmount,
             likes: video.videoStatistic?.likesAmount,
+            dislikes: video.videoStatistic?.dislikesAmount,
+          },
+          metaData: {
+            isViewed: video.metaData.isViewed,
+            isLiked: video.metaData.isLiked,
+            isDisliked: video.metaData.isDisliked,
           },
         };
       }),

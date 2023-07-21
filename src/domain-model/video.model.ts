@@ -1,3 +1,4 @@
+import { VideoReactionsEnum } from './video-reactions.model';
 import { User } from './user.model';
 import { config } from '../config';
 import {
@@ -23,10 +24,12 @@ import {
   ISwipeVideoQueryResponse,
   ISwipeVideosData,
   ISwipeVideosResponse,
+  IVideoMetaRecordResponse,
 } from './interfaces';
 import { Op } from 'sequelize';
 import { VideoViews } from './video-views.model';
 import { VideoStatistic } from './video-statistic.model';
+import { VideoReactions } from './video-reactions.model';
 
 export interface IVideo {
   id?: number;
@@ -76,6 +79,9 @@ export class Video extends Base<IVideo> {
 
   @HasOne(() => VideoStatistic)
   videoStatistic: VideoStatistic;
+
+  @BelongsToMany(() => User, () => VideoReactions)
+  userVideoReactions: Array<User & { VideoReactions: VideoReactions }>;
 
   @AllowNull(false)
   @Default(DataType.NOW())
@@ -127,13 +133,42 @@ export class Video extends Base<IVideo> {
           model: VideoStatistic,
           attributes: { exclude: ['id', 'videoId', 'createdAt', 'updatedAt'] },
         },
+        {
+          model: User,
+          as: 'userViews',
+          attributes: ['id'],
+          where: { id: userId },
+          required: false,
+        },
+        {
+          model: User,
+          as: 'userVideoReactions',
+          attributes: ['id'],
+          where: { id: userId },
+          required: false,
+        },
       ],
       limit: itemLimit,
       offset,
-    })) as ISwipeVideoQueryResponse;
+    })) as unknown as ISwipeVideoQueryResponse;
+
+    const videoResult = videos.rows.map(video => {
+      return {
+        ...video.dataValues,
+        metaData: {
+          isViewed: video.userViews.length > 0,
+          isLiked:
+            video.userVideoReactions[0]?.VideoReactions?.reactionTitle ===
+            VideoReactionsEnum.like,
+          isDisliked:
+            video.userVideoReactions[0]?.VideoReactions?.reactionTitle ===
+            VideoReactionsEnum.dislike,
+        },
+      };
+    }) as Array<IVideoMetaRecordResponse>;
 
     return {
-      videos: videos.rows,
+      videos: videoResult,
       pagination: {
         page,
         pageSize: videos.rows.length,

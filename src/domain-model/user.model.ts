@@ -20,6 +20,7 @@ import bcrypt from 'bcrypt';
 import { NotFoundX } from './domain-model-exception';
 import { Video } from './video.model';
 import { VideoViews } from './video-views.model';
+import { VideoReactions } from './video-reactions.model';
 
 export interface IUser {
   id?: number;
@@ -71,6 +72,9 @@ export class User extends Base<IUser> {
 
   @BelongsToMany(() => Video, () => VideoViews)
   videoViews: Array<Video & { VideoViews: VideoViews }>;
+
+  @BelongsToMany(() => Video, () => VideoReactions)
+  videoReactions: Array<Video & { VideoReactions: VideoReactions }>;
 
   @AllowNull(false)
   @Default(DataType.NOW())

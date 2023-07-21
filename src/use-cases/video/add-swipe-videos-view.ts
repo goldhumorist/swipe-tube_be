@@ -30,7 +30,7 @@ export default class AddSwipeVideosView extends UseCaseBase<
 
       const videoViews = await VideoViews.addViewForVideo(
         {
-          authorId: userId,
+          userId,
           videoId,
         },
         transaction,
@@ -65,7 +65,7 @@ export default class AddSwipeVideosView extends UseCaseBase<
   dumpVideoViews(videoViews: IVideoViews): IVideoViewsDumpedResponse {
     const dumpedResponse: IVideoViewsDumpedResponse = {
       videoId: videoViews.videoId,
-      userId: videoViews.authorId,
+      userId: videoViews.userId,
     };
 
     return dumpedResponse;

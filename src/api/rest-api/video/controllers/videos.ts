@@ -2,6 +2,7 @@ import { filterFileType } from './../../../utils';
 import MyVideos from '../../../../use-cases/video/my-videos';
 import UploadVideo from '../../../../use-cases/video/upload';
 import SwipeVideos from '../../../../use-cases/video/swipe-videos';
+import UpdateVideoReaction from '../../../../use-cases/video/update-video-reaction';
 import AddSwipeVideosView from '../../../../use-cases/video/add-swipe-videos-view';
 import { chista } from '../../../utils';
 import {
@@ -39,6 +40,14 @@ export default {
     ...req.session?.context,
     ...req.query,
   })),
+
+  updateVideoReaction: chista.makeUseCaseRunner(
+    UpdateVideoReaction,
+    (req: IRequest) => ({
+      ...req.session?.context,
+      ...req.body,
+    }),
+  ),
 
   uploadVideo: async (req: IRequest, res: Response) => {
     try {
