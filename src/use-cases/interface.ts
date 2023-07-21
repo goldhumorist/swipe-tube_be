@@ -1,6 +1,6 @@
 import { IVideoStatistic } from './../domain-model/video-statistic.model';
 import { VideoReactionsEnum } from './../domain-model/video-reactions.model';
-import { IVideoPagination } from './../domain-model/interfaces';
+import { IVideoMeta, IVideoPagination } from './../domain-model/interfaces';
 
 export interface ISessionDumpedResponse {
   userId?: number;
@@ -155,17 +155,23 @@ export interface IUpdateVideoReactionParams {
   reaction: VideoReactionsEnum;
 }
 
+export type IVideoMetaWithoutViewed = Omit<IVideoMeta, 'isViewed'>;
+
 export interface IUpdateVideoReactionDumped {
   userId: number;
   videoId: number;
-  likes?: number;
-  dislikes?: number;
+  statistic: {
+    likes?: number;
+    dislikes?: number;
+  };
+  metaData: IVideoMetaWithoutViewed;
 }
 
 export interface IUpdateVideoReactionDataToDump {
   userId: number;
   videoId: number;
   videoStatistic: IVideoStatistic;
+  videoMeta: IVideoMetaWithoutViewed;
 }
 
 export interface IUpdateVideoReactionFullResponse {

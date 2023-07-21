@@ -1,8 +1,8 @@
-import { VideoLikesActionEnum } from './../../domain-model/interfaces';
 import {
-  IVideoStatistic,
-  VideoStatistic,
-} from './../../domain-model/video-statistic.model';
+  IUpdateVideoLikesParams,
+  VideoLikesActionEnum,
+} from './../../domain-model/interfaces';
+import { VideoStatistic } from './../../domain-model/video-statistic.model';
 import { Database } from './../../domain-model/index';
 import {
   VideoReactions,
@@ -37,54 +37,63 @@ export default class UpdateVideoReaction extends UseCaseBase<
     try {
       const { userId, videoId, reaction } = data;
 
-      const { isVideoUpdated, newReactionTitle } =
-        await VideoReactions.updateVideoReaction(
-          {
-            reactionTitle: reaction,
-            userId,
-            videoId,
-          },
-          transaction,
-        );
-
-      if (!isVideoUpdated) {
-        const videoStatistic = (await VideoStatistic.findOne({
-          where: { videoId },
-          transaction,
-        })) as IVideoStatistic;
-
-        await transaction.commit();
-
-        return {
-          data: this.dumpResult({
-            userId,
-            videoId,
-            videoStatistic,
-          }),
-        };
-      }
-
-      let updatedVideoStatistic: IVideoStatistic;
-
-      if (newReactionTitle === VideoReactionsEnum.like) {
-        updatedVideoStatistic = await VideoStatistic.updateVideoLikes(
-          {
-            like: VideoLikesActionEnum.increase,
-            dislike: VideoLikesActionEnum.descrease,
-          },
+      const reactionUpdatingResult = await VideoReactions.updateVideoReaction(
+        {
+          reactionTitle: reaction,
+          userId,
           videoId,
-          transaction,
-        );
+        },
+        transaction,
+      );
+
+      const updateStatsParams: IUpdateVideoLikesParams = {};
+
+      // The user has canceled his reaction
+      if (reactionUpdatingResult.newReactionTitle === null) {
+        // After user has canceled reaction we should decrease statistic
+        if (
+          reactionUpdatingResult.previousReactionTitle ===
+          VideoReactionsEnum.like
+        )
+          updateStatsParams.like = VideoLikesActionEnum.descrease;
+
+        // After user has canceled reaction we should decrease statistic
+        if (
+          reactionUpdatingResult.previousReactionTitle ===
+          VideoReactionsEnum.dislike
+        )
+          updateStatsParams.dislike = VideoLikesActionEnum.descrease;
       } else {
-        updatedVideoStatistic = await VideoStatistic.updateVideoLikes(
-          {
-            like: VideoLikesActionEnum.descrease,
-            dislike: VideoLikesActionEnum.increase,
-          },
-          videoId,
-          transaction,
-        );
+        // User has changed reaction dislike -> like
+        if (
+          reactionUpdatingResult.newReactionTitle === VideoReactionsEnum.like
+        ) {
+          updateStatsParams.like = VideoLikesActionEnum.increase;
+          updateStatsParams.dislike = VideoLikesActionEnum.descrease;
+        }
+
+        // User has changed reaction like -> dislike
+        if (
+          reactionUpdatingResult.newReactionTitle === VideoReactionsEnum.dislike
+        ) {
+          updateStatsParams.like = VideoLikesActionEnum.descrease;
+          updateStatsParams.dislike = VideoLikesActionEnum.increase;
+        }
       }
+
+      const updatedVideoStatistic = await VideoStatistic.updateVideoLikes(
+        updateStatsParams,
+        videoId,
+        transaction,
+      );
+
+      const updatedVideoMeta = {
+        isLiked:
+          reactionUpdatingResult.newReactionTitle === VideoReactionsEnum.like,
+        isDisliked:
+          reactionUpdatingResult.newReactionTitle ===
+          VideoReactionsEnum.dislike,
+      };
 
       await transaction.commit();
 
@@ -93,6 +102,7 @@ export default class UpdateVideoReaction extends UseCaseBase<
           userId,
           videoId,
           videoStatistic: updatedVideoStatistic,
+          videoMeta: updatedVideoMeta,
         }),
       };
     } catch (error) {
@@ -102,13 +112,19 @@ export default class UpdateVideoReaction extends UseCaseBase<
   }
 
   dumpResult(data: IUpdateVideoReactionDataToDump): IUpdateVideoReactionDumped {
-    const { userId, videoId, videoStatistic } = data;
+    const { userId, videoId, videoStatistic, videoMeta } = data;
 
     return {
       userId,
       videoId,
-      likes: videoStatistic.likesAmount,
-      dislikes: videoStatistic.dislikesAmount,
+      statistic: {
+        likes: videoStatistic.likesAmount,
+        dislikes: videoStatistic.dislikesAmount,
+      },
+      metaData: {
+        isLiked: videoMeta.isLiked,
+        isDisliked: videoMeta.isDisliked,
+      },
     };
   }
 }

@@ -85,8 +85,8 @@ export interface IUpdateVideoReactionData {
 }
 
 export interface IUpdateVideoReactionDMResponse {
-  isVideoUpdated: boolean;
-  newReactionTitle: VideoReactionsEnum;
+  previousReactionTitle: VideoReactionsEnum | null;
+  newReactionTitle: VideoReactionsEnum | null;
 }
 
 export enum VideoLikesActionEnum {
@@ -95,6 +95,6 @@ export enum VideoLikesActionEnum {
 }
 
 export interface IUpdateVideoLikesParams {
-  like: VideoLikesActionEnum;
-  dislike: VideoLikesActionEnum;
+  like?: VideoLikesActionEnum | null;
+  dislike?: VideoLikesActionEnum | null;
 }

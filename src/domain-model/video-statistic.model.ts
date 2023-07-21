@@ -16,6 +16,7 @@ import { Base } from './base';
 import { Video } from './video.model';
 import { Sequelize, Transaction } from 'sequelize';
 import { IUpdateVideoLikesParams, VideoLikesActionEnum } from './interfaces';
+import { Literal } from 'sequelize/types/utils';
 
 export interface IVideoStatistic {
   id?: number;
@@ -97,21 +98,28 @@ export class VideoStatistic extends Base<IVideoStatistic> {
   ): Promise<IVideoStatistic> {
     const { like, dislike } = params;
 
-    const updateParams = {
-      likesAmount:
+    const updateParams: {
+      likesAmount?: Literal;
+      dislikesAmount?: Literal;
+    } = {};
+
+    if (like) {
+      updateParams.likesAmount =
         like === VideoLikesActionEnum.increase
           ? Sequelize.literal(`likes_amount + 1`)
           : Sequelize.literal(
               'CASE WHEN likes_amount > 0 THEN likes_amount - 1 ELSE 0 END',
-            ),
+            );
+    }
 
-      dislikesAmount:
+    if (dislike) {
+      updateParams.dislikesAmount =
         dislike === VideoLikesActionEnum.increase
           ? Sequelize.literal(`dislikes_amount + 1`)
           : Sequelize.literal(
               'CASE WHEN dislikes_amount > 0 THEN dislikes_amount - 1 ELSE 0 END',
-            ),
-    };
+            );
+    }
 
     const [_, [updatedRow]] = await VideoStatistic.update(updateParams, {
       where: { videoId },

@@ -12,7 +12,7 @@ import {
 } from 'sequelize-typescript';
 import { Base } from './base';
 import { Video } from './video.model';
-import { Sequelize, Transaction } from 'sequelize';
+import { Transaction } from 'sequelize';
 import {
   IUpdateVideoReactionDMResponse,
   IUpdateVideoReactionData,
@@ -26,7 +26,7 @@ export enum VideoReactionsEnum {
 export interface IVideoReactions {
   userId: number;
   videoId: number;
-  reactionTitle: 'LIKE' | 'DISLIKE';
+  reactionTitle: 'LIKE' | 'DISLIKE' | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -68,6 +68,7 @@ export class VideoReactions extends Base<IVideoReactions> {
     transaction?: Transaction,
   ): Promise<IUpdateVideoReactionDMResponse> {
     const { videoId, reactionTitle, userId } = data;
+    let newReactionTitle: VideoReactionsEnum | null = reactionTitle;
 
     const videoReactionRow = await VideoReactions.findOne({
       where: { userId, videoId },
@@ -75,16 +76,22 @@ export class VideoReactions extends Base<IVideoReactions> {
     });
 
     if (videoReactionRow) {
+      // We should cancel the reaction if we receive a request with the current reaction value
+      if (videoReactionRow.reactionTitle === reactionTitle)
+        newReactionTitle = null;
+
       const [_, [updatedRow]] = await VideoReactions.update(
-        { reactionTitle },
+        { reactionTitle: newReactionTitle },
         {
           where: { userId, videoId },
           returning: true,
           transaction,
         },
       );
+
       return {
-        isVideoUpdated: videoReactionRow.reactionTitle !== reactionTitle,
+        previousReactionTitle:
+          videoReactionRow.reactionTitle as VideoReactionsEnum,
         newReactionTitle: updatedRow.reactionTitle as VideoReactionsEnum,
       };
     }
@@ -92,11 +99,11 @@ export class VideoReactions extends Base<IVideoReactions> {
     const videoReaction = await VideoReactions.create({
       userId,
       videoId,
-      reactionTitle,
+      reactionTitle: newReactionTitle,
     });
 
     return {
-      isVideoUpdated: true,
+      previousReactionTitle: null,
       newReactionTitle: videoReaction.reactionTitle as VideoReactionsEnum,
     };
   }
