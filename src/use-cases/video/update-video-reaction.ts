@@ -46,39 +46,18 @@ export default class UpdateVideoReaction extends UseCaseBase<
         transaction,
       );
 
-      const updateStatsParams: IUpdateVideoLikesParams = {};
+      let updateStatsParams: IUpdateVideoLikesParams = {};
 
-      // The user has canceled his reaction
-      if (reactionUpdatingResult.newReactionTitle === null) {
-        // After user has canceled reaction we should decrease statistic
-        if (
-          reactionUpdatingResult.previousReactionTitle ===
-          VideoReactionsEnum.like
-        )
-          updateStatsParams.like = VideoLikesActionEnum.descrease;
+      const { newReactionTitle, previousReactionTitle } =
+        reactionUpdatingResult;
 
-        // After user has canceled reaction we should decrease statistic
-        if (
-          reactionUpdatingResult.previousReactionTitle ===
-          VideoReactionsEnum.dislike
-        )
-          updateStatsParams.dislike = VideoLikesActionEnum.descrease;
+      if (this.isUserCanceledReaction(newReactionTitle)) {
+        updateStatsParams = this.getParamsForStatsAfterCancelingReaction(
+          previousReactionTitle,
+        );
       } else {
-        // User has changed reaction dislike -> like
-        if (
-          reactionUpdatingResult.newReactionTitle === VideoReactionsEnum.like
-        ) {
-          updateStatsParams.like = VideoLikesActionEnum.increase;
-          updateStatsParams.dislike = VideoLikesActionEnum.descrease;
-        }
-
-        // User has changed reaction like -> dislike
-        if (
-          reactionUpdatingResult.newReactionTitle === VideoReactionsEnum.dislike
-        ) {
-          updateStatsParams.like = VideoLikesActionEnum.descrease;
-          updateStatsParams.dislike = VideoLikesActionEnum.increase;
-        }
+        updateStatsParams =
+          this.getParamsForStatsAfterChangingReaction(newReactionTitle);
       }
 
       const updatedVideoStatistic = await VideoStatistic.updateVideoLikes(
@@ -126,5 +105,41 @@ export default class UpdateVideoReaction extends UseCaseBase<
         isDisliked: videoMeta.isDisliked,
       },
     };
+  }
+
+  isUserCanceledReaction(newReaction: VideoReactionsEnum | null) {
+    return newReaction === null;
+  }
+
+  getParamsForStatsAfterCancelingReaction(
+    previousReaction: VideoReactionsEnum | null,
+  ): IUpdateVideoLikesParams {
+    const params: IUpdateVideoLikesParams = {};
+
+    if (previousReaction === VideoReactionsEnum.like)
+      params.like = VideoLikesActionEnum.descrease;
+
+    if (previousReaction === VideoReactionsEnum.dislike)
+      params.dislike = VideoLikesActionEnum.descrease;
+
+    return params;
+  }
+
+  getParamsForStatsAfterChangingReaction(
+    newReaction: VideoReactionsEnum | null,
+  ): IUpdateVideoLikesParams {
+    const params: IUpdateVideoLikesParams = {};
+
+    if (newReaction === VideoReactionsEnum.like) {
+      params.like = VideoLikesActionEnum.increase;
+      params.dislike = VideoLikesActionEnum.descrease;
+    }
+
+    if (newReaction === VideoReactionsEnum.dislike) {
+      params.like = VideoLikesActionEnum.descrease;
+      params.dislike = VideoLikesActionEnum.increase;
+    }
+
+    return params;
   }
 }

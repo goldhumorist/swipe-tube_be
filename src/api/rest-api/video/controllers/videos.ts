@@ -1,5 +1,6 @@
 import { filterFileType } from './../../../utils';
 import MyVideos from '../../../../use-cases/video/my-videos';
+import LikedVideos from '../../../../use-cases/video/liked-videos';
 import UploadVideo from '../../../../use-cases/video/upload';
 import SwipeVideos from '../../../../use-cases/video/swipe-videos';
 import UpdateVideoReaction from '../../../../use-cases/video/update-video-reaction';
@@ -24,6 +25,11 @@ const upload = multer({
 
 export default {
   myVideos: chista.makeUseCaseRunner(MyVideos, (req: IRequest) => ({
+    ...req.session?.context,
+    ...req.query,
+  })),
+
+  likedVideos: chista.makeUseCaseRunner(LikedVideos, (req: IRequest) => ({
     ...req.session?.context,
     ...req.query,
   })),
