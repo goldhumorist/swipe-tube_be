@@ -25,6 +25,7 @@ import {
   ISwipeVideosData,
   ISwipeVideosResponse,
   IVideoMetaRecordResponse,
+  ILikedVideosResponse,
 } from './interfaces';
 import { Op } from 'sequelize';
 import { VideoViews } from './video-views.model';
@@ -104,7 +105,56 @@ export class Video extends Base<IVideo> {
 
     const videos = await Video.findAndCountAll({
       where: { authorId: userId },
+      include: [
+        {
+          model: VideoStatistic,
+          attributes: { exclude: ['id', 'videoId', 'createdAt', 'updatedAt'] },
+        },
+      ],
       order: [['createdAt', 'DESC']],
+      limit,
+      offset,
+    });
+
+    return {
+      videos: videos.rows,
+      pagination: {
+        page,
+        pageSize: videos.rows.length,
+        totalRows: videos.count,
+      },
+    };
+  }
+
+  static async listLikedVideos(
+    data: IListMyVideosData,
+  ): Promise<ILikedVideosResponse> {
+    const { userId, page, limit } = data;
+
+    const offset = limit * page - limit;
+
+    const videos = await Video.findAndCountAll({
+      include: [
+        {
+          model: VideoStatistic,
+          attributes: { exclude: ['id', 'videoId', 'createdAt', 'updatedAt'] },
+        },
+        {
+          model: User,
+          as: 'userVideoReactions',
+          attributes: [],
+          through: {
+            where: {
+              reactionTitle: VideoReactionsEnum.like,
+              userId,
+            },
+          },
+        },
+      ],
+      where: {
+        ['$userVideoReactions.id$']: userId,
+      },
+      subQuery: false,
       limit,
       offset,
     });

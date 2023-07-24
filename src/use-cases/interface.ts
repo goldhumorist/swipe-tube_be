@@ -95,11 +95,44 @@ export interface IMyVideosDumpedResponse {
     videoUrlPath: string;
     thumbnailUrlPath: string;
     description?: string | null;
+    statistic: {
+      views: number;
+      likes: number;
+      dislikes: number;
+    };
   }>;
 }
 
 export interface IMyVideosFullResponse {
   data: IMyVideosDumpedResponse;
+}
+
+export interface ILikedVideosParams {
+  userId: number;
+  page: number;
+  limit: number;
+}
+
+export interface ILikedVideosDumpedResponse {
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalRows: number;
+  };
+  videos: Array<{
+    videoUrlPath: string;
+    thumbnailUrlPath: string;
+    description?: string | null;
+    statistic: {
+      views: number;
+      likes: number;
+      dislikes: number;
+    };
+  }>;
+}
+
+export interface ILikedVideosFullResponse {
+  data: ILikedVideosDumpedResponse;
 }
 
 export interface ISwipeVideosParams {

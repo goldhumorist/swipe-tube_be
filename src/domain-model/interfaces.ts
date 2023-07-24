@@ -29,8 +29,17 @@ interface IDataValues {
   [key: string]: string | number;
 }
 
+export type IVideoWithStatistic = IVideo & {
+  videoStatistic: IVideoStatisticData;
+};
+
 export interface IMyVideosResponse {
-  videos: Array<IVideo>;
+  videos: Array<IVideoWithStatistic>;
+  pagination: IVideoPagination;
+}
+
+export interface ILikedVideosResponse {
+  videos: Array<IVideoWithStatistic>;
   pagination: IVideoPagination;
 }
 
