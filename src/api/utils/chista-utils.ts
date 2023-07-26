@@ -5,8 +5,8 @@
 import { Exception, ERROR_CODE } from '../../global-help-utils';
 import { loggerFactory } from '../../infrastructure/logger';
 import UseCaseBase from '../../use-cases/base';
-import { Request, Response } from 'express';
-import { IRequest } from '../rest-api/interfaces';
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { IRequestWithSession } from '../rest-api/interfaces';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -42,7 +42,7 @@ export function makeUseCaseRunner(
   paramsBuilder: Function = () => {},
   contextBuilder: Function = () => {},
 ) {
-  return async function useCaseRunner(req: Request, res: Response) {
+  return async function useCaseRunner(req: FastifyRequest, res: FastifyReply) {
     const resultPromise = runUseCase(useCaseClass, {
       params: paramsBuilder(req, res),
       context: contextBuilder(req, res),
@@ -53,8 +53,8 @@ export function makeUseCaseRunner(
 }
 
 export async function renderPromiseAsJson(
-  req: Request | IRequest,
-  res: Response,
+  req: FastifyRequest | IRequestWithSession,
+  res: FastifyReply,
   promise: Promise<any>,
 ) {
   try {
@@ -62,23 +62,23 @@ export async function renderPromiseAsJson(
 
     data.status = 1;
 
-    return res.send(data);
+    res.send(data);
   } catch (error: any) {
     if (error instanceof Exception) {
-      return res.send({
+      res.send({
         status: 0,
         error: error.toResponse(),
       });
+    } else {
+      logger.error('FATAL ERROR', error);
+
+      res.send({
+        status: 0,
+        error: {
+          code: ERROR_CODE.SERVER_ERROR,
+          message: 'Something went wrong.',
+        },
+      });
     }
-
-    logger.error('FATAL ERROR', error);
-
-    res.send({
-      status: 0,
-      error: {
-        code: ERROR_CODE.SERVER_ERROR,
-        message: 'Something went wrong.',
-      },
-    });
   }
 }

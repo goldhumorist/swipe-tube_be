@@ -1,9 +1,10 @@
-import express from 'express';
+import { FastifyPluginCallback } from 'fastify';
 import controllers from './controllers';
-const router = express.Router();
 
-const checkSession = controllers.session.checkSession;
+const sessionRouter: FastifyPluginCallback = (app, opts, done) => {
+  app.get('/check', controllers.session.checkSession);
 
-router.get('/check', checkSession);
+  done();
+};
 
-export default router;
+export default sessionRouter;

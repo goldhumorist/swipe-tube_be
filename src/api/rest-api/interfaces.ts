@@ -1,9 +1,14 @@
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify';
+import { File } from 'fastify-multer/lib/interfaces';
 
-export interface IRequest extends Request {
+export interface IRequestWithSession extends FastifyRequest {
   session?: {
     context: {
       userId: number;
     };
   };
+}
+
+export interface IRequestWithFile extends FastifyRequest {
+  file?: File;
 }

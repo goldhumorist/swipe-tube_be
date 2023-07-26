@@ -11,10 +11,10 @@ import {
   ERROR_CODE,
   FILE_SIZE_LIMIT,
 } from '../../../../global-help-utils/enums';
-import { Response } from 'express';
-import multer, { MulterError } from 'multer';
+import multer, { MulterError } from 'fastify-multer';
 import { loggerFactory } from '../../../../infrastructure/logger';
-import { IRequest } from '../../interfaces';
+import { IRequestWithFile, IRequestWithSession } from '../../interfaces';
+import { FastifyReply, FastifyInstance } from 'fastify';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -24,46 +24,54 @@ const upload = multer({
 });
 
 export default {
-  myVideos: chista.makeUseCaseRunner(MyVideos, (req: IRequest) => ({
+  myVideos: chista.makeUseCaseRunner(MyVideos, (req: IRequestWithSession) => ({
     ...req.session?.context,
-    ...req.query,
+    ...(req.query || {}),
   })),
 
-  likedVideos: chista.makeUseCaseRunner(LikedVideos, (req: IRequest) => ({
-    ...req.session?.context,
-    ...req.query,
-  })),
+  likedVideos: chista.makeUseCaseRunner(
+    LikedVideos,
+    (req: IRequestWithSession) => ({
+      ...req.session?.context,
+      ...(req.query || {}),
+    }),
+  ),
 
   addVideoView: chista.makeUseCaseRunner(
     AddSwipeVideosView,
-    (req: IRequest) => ({
+    (req: IRequestWithSession) => ({
       ...req.session?.context,
-      ...req.body,
+      ...(req.body || {}),
     }),
   ),
 
-  swipeVideos: chista.makeUseCaseRunner(SwipeVideos, (req: IRequest) => ({
-    ...req.session?.context,
-    ...req.query,
-  })),
+  swipeVideos: chista.makeUseCaseRunner(
+    SwipeVideos,
+    (req: IRequestWithSession) => ({
+      ...req.session?.context,
+      ...(req.query || {}),
+    }),
+  ),
 
   updateVideoReaction: chista.makeUseCaseRunner(
     UpdateVideoReaction,
-    (req: IRequest) => ({
+    (req: IRequestWithSession) => ({
       ...req.session?.context,
-      ...req.body,
+      ...(req.body || {}),
     }),
   ),
 
-  uploadVideo: async (req: IRequest, res: Response) => {
+  uploadVideo: async (req: IRequestWithSession, res: FastifyReply) => {
     try {
       await new Promise<void>((resolve, reject) => {
-        upload.single('video')(req, res, err =>
-          err ? reject(err) : resolve(),
+        upload.single('video').bind(this as unknown as FastifyInstance)(
+          req,
+          res,
+          err => (err ? reject(err) : resolve()),
         );
       });
 
-      const { file } = req;
+      const { file } = req as IRequestWithFile;
 
       const promise = chista.runUseCase(UploadVideo, {
         params: {
@@ -72,7 +80,7 @@ export default {
         },
       });
 
-      chista.renderPromiseAsJson(req, res, promise);
+      await chista.renderPromiseAsJson(req, res, promise);
     } catch (error: any) {
       logger.error('Upload Video Error', error);
 

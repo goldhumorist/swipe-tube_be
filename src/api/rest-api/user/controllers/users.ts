@@ -4,12 +4,13 @@ import {
   ERROR_CODE,
   FILE_SIZE_LIMIT,
 } from '../../../../global-help-utils/enums';
-import { Request, Response } from 'express';
 import { loggerFactory } from '../../../../infrastructure/logger';
-import multer, { MulterError } from 'multer';
+import multer, { MulterError } from 'fastify-multer';
 import { chista } from '../../../utils';
 import UserSignup from '../../../../use-cases/user/signup';
 import UserLogin from '../../../../use-cases/user/login';
+import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
+import { IRequestWithFile } from '../../interfaces';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -19,26 +20,28 @@ const upload = multer({
 });
 
 export default {
-  login: chista.makeUseCaseRunner(UserLogin, (req: Request) => req.body),
+  login: chista.makeUseCaseRunner(UserLogin, (req: FastifyRequest) => req.body),
 
-  signup: async (req: Request, res: Response) => {
+  signup: async (req: FastifyRequest, res: FastifyReply): Promise<any> => {
     try {
       await new Promise<void>((resolve, reject) => {
-        upload.single('avatarImage')(req, res, err =>
-          err ? reject(err) : resolve(),
+        upload.single('avatarImage').bind(this as unknown as FastifyInstance)(
+          req,
+          res,
+          err => (err ? reject(err) : resolve()),
         );
       });
 
-      const { file } = req;
+      const { file } = req as IRequestWithFile;
 
       const promise = chista.runUseCase(UserSignup, {
         params: {
-          ...req.body,
+          ...(req.body || {}),
           file,
         },
       });
 
-      chista.renderPromiseAsJson(req, res, promise);
+      await chista.renderPromiseAsJson(req, res, promise);
     } catch (error: any) {
       logger.error('SIGN UP ERROR', error);
 
