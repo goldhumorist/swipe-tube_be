@@ -2,6 +2,7 @@
 import path from 'path';
 import { pino } from 'pino';
 import pretty from 'pino-pretty';
+import { config } from '../config';
 
 const stream = pretty({
   colorize: true,
@@ -11,7 +12,8 @@ const stream = pretty({
   singleLine: true,
 });
 
-export const pinoForLogger = pino({}, stream);
+export const pinoForLogger =
+  config.nodeEnv === 'production' ? pino({}) : pino({}, stream);
 
 class Logger {
   private _logger: pino.Logger;
