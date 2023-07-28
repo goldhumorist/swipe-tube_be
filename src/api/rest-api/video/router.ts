@@ -1,20 +1,24 @@
-import express from 'express';
+import { FastifyPluginCallback } from 'fastify';
 import controllers from './controllers';
 import sessionController from '../session/controllers';
 
-const router = express.Router();
+const checkSession = {
+  preHandler: sessionController.session.checkSessionMiddleware,
+};
 
-const checkSession = sessionController.session.checkSessionMiddleware;
+const videoRouter: FastifyPluginCallback = (app, opts, done) => {
+  app.get('/my-videos', checkSession, controllers.videos.myVideos);
+  app.get('/liked-videos', checkSession, controllers.videos.likedVideos);
+  app.get('/swipe-videos', checkSession, controllers.videos.swipeVideos);
+  app.post('/upload', checkSession, controllers.videos.uploadVideo);
+  app.post('/add-video-view', checkSession, controllers.videos.addVideoView);
+  app.post(
+    '/update-video-reaction',
+    checkSession,
+    controllers.videos.updateVideoReaction,
+  );
 
-router.get('/my-videos', checkSession, controllers.videos.myVideos);
-router.get('/liked-videos', checkSession, controllers.videos.likedVideos);
-router.get('/swipe-videos', checkSession, controllers.videos.swipeVideos);
-router.post('/upload', checkSession, controllers.videos.uploadVideo);
-router.post('/add-video-view', checkSession, controllers.videos.addVideoView);
-router.post(
-  '/update-video-reaction',
-  checkSession,
-  controllers.videos.updateVideoReaction,
-);
+  done();
+};
 
-export default router;
+export default videoRouter;

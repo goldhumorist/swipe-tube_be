@@ -18,9 +18,16 @@ export const AVAILABLE_IMAGE_MIMETYPES = [
 ];
 export const AVAILABLE_VIDEO_MIMETYPES = ['video/mp4'];
 
-export enum FILE_SIZE_LIMIT {
+export enum FILE_SIZE_LIMIT_IN_KB {
   THREE_MEGABYTES = 3 * 1024 * 1024,
   TEN_MEGABYTES = 10 * 1024 * 1024,
+  TWENTY_MEGABYTES = 20 * 1024 * 1024,
+}
+
+export enum FILE_SIZE_LIMIT_IN_MB {
+  THREE_MEGABYTES = 3,
+  TEN_MEGABYTES = 10,
+  TWENTY_MEGABYTES = 50,
 }
 
 export enum FILES_PREFIX {

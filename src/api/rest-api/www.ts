@@ -1,43 +1,41 @@
-import express from 'express';
+import Fastify from 'fastify';
 import { loggerFactory } from '../../infrastructure/logger';
-import { promisify } from 'util';
-import { middlewares } from './middlewares';
+import { plugins, pluginsOptions, fastifyOptions, handlers } from '../utils';
 import userRouter from './user/router';
 import videoRouter from './video/router';
 import sessionRouter from './session/router';
 
 const logger = loggerFactory.getLogger(__filename);
 
-const app = express();
+const app = Fastify(fastifyOptions);
 
-app.use(middlewares.json);
-app.use(middlewares.urlencoded);
-app.use(middlewares.cors);
-app.use(middlewares.helmet);
-app.use(middlewares.loggerMiddleware);
+app.register(plugins.formBody);
+app.register(plugins.cors, pluginsOptions.cors);
+app.register(plugins.helmet);
+app.register(plugins.fileContentParser, pluginsOptions.fileContentParser);
 
-app.use('/api/v1/user', userRouter);
-app.use('/api/v1/video', videoRouter);
-app.use('/api/v1/session', sessionRouter);
+app.addHook('preHandler', handlers.preHandlerBodyLogger);
 
-let server;
+app.register(userRouter, { prefix: '/api/v1/user' });
+app.register(sessionRouter, { prefix: '/api/v1/session' });
+app.register(videoRouter, { prefix: '/api/v1/video' });
 
-export function start({ appPort }) {
-  const normalizedPort = normalizePort(appPort);
+const server = app;
 
-  server = app.listen(normalizedPort, () => {
-    const { port, address } = server.address();
+export async function start({ appPort }) {
+  const port = normalizePort(appPort);
 
-    logger.info(`[RestApiApp] STARTING AT PORT [${port}] ADDRESS [${address}]`);
+  app.listen({ port }, (error, address) => {
+    if (error) throw error;
+
+    logger.info(`[RestApiApp] STARTING ON ADDRESS [${address}]`);
   });
-
-  server.closeAsync = promisify(server.close);
 }
 
 export async function stop() {
   if (!server) return;
   logger.info('[RestApiApp] Closing server');
-  await server.closeAsync();
+  await server.close();
 }
 /**
  * Helper

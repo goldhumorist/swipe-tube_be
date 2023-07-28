@@ -1,19 +1,18 @@
 import { SessionCheck } from '../../../../use-cases/session/sessionCheck';
-import { IRequest } from '../../interfaces';
-import { NextFunction, Request, Response } from 'express';
+import { IRequestWithSession } from '../../interfaces';
 import { chista } from '../../../utils';
 import { ISessionFullResponse } from '../../../../use-cases/interface';
+import { FastifyRequest, FastifyReply } from 'fastify';
 
 export default {
-  checkSession: chista.makeUseCaseRunner(SessionCheck, (req: Request) => ({
-    token: req.headers?.authorization?.replace('Bearer ', ''),
-  })),
+  checkSession: chista.makeUseCaseRunner(
+    SessionCheck,
+    (req: FastifyRequest) => ({
+      token: req.headers?.authorization?.replace('Bearer ', ''),
+    }),
+  ),
 
-  checkSessionMiddleware: async (
-    req: IRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  checkSessionMiddleware: async (req: FastifyRequest, res: FastifyReply) => {
     const token = req.headers?.authorization?.replace('Bearer ', '');
 
     const sessionCheckPromise: Promise<ISessionFullResponse> =
@@ -26,14 +25,13 @@ export default {
       const { userId } = data;
 
       if (userId)
-        req.session = {
+        (req as IRequestWithSession).session = {
           context: {
             userId,
           },
         };
-      return next();
     } catch (error) {
-      return chista.renderPromiseAsJson(req, res, sessionCheckPromise);
+      await chista.renderPromiseAsJson(req, res, sessionCheckPromise);
     }
   },
 };

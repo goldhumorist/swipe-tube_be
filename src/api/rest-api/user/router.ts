@@ -1,8 +1,11 @@
-import express from 'express';
+import { FastifyPluginCallback } from 'fastify';
 import controllers from './controllers';
-const router = express.Router();
 
-router.post('/signup', controllers.users.signup);
-router.post('/login', controllers.users.login);
+const userRouter: FastifyPluginCallback = (app, opts, done) => {
+  app.post('/signup', controllers.users.signup);
+  app.post('/login', controllers.users.login);
 
-export default router;
+  done();
+};
+
+export default userRouter;

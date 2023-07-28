@@ -20,7 +20,6 @@ export interface ISessionFullResponse {
 export interface IFile {
   buffer: Buffer;
   originalname: string;
-  size: string;
   encoding: string;
   mimetype: string;
 }
