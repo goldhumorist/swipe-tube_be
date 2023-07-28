@@ -1,43 +1,51 @@
-import { filterFileType } from './../../../utils';
+import { FastifyRequest, FastifyReply } from 'fastify';
+import {
+  chista,
+  filterFileType,
+  filterFileSize,
+  parseMultiFormBody,
+} from '../../../utils';
 import {
   AVAILABLE_IMAGE_MIMETYPES,
   ERROR_CODE,
-  FILE_SIZE_LIMIT,
-} from '../../../../global-help-utils/enums';
-import { loggerFactory } from '../../../../infrastructure/logger';
-import multer, { MulterError } from 'fastify-multer';
-import { chista } from '../../../utils';
+  FILE_SIZE_LIMIT_IN_MB,
+  Exception,
+} from '../../../../global-help-utils';
 import UserSignup from '../../../../use-cases/user/signup';
 import UserLogin from '../../../../use-cases/user/login';
-import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
-import { IRequestWithFile } from '../../interfaces';
+import { IFile } from './../../../../use-cases/interface';
+import { ISignupBody } from '../../interfaces';
+import { loggerFactory } from '../../../../infrastructure/logger';
 
 const logger = loggerFactory.getLogger(__filename);
-
-const upload = multer({
-  limits: { fileSize: FILE_SIZE_LIMIT.THREE_MEGABYTES },
-  fileFilter: filterFileType(AVAILABLE_IMAGE_MIMETYPES),
-});
 
 export default {
   login: chista.makeUseCaseRunner(UserLogin, (req: FastifyRequest) => req.body),
 
-  signup: async (req: FastifyRequest, res: FastifyReply): Promise<any> => {
+  signup: async (
+    req: FastifyRequest<{ Body: ISignupBody }>,
+    res: FastifyReply,
+  ) => {
     try {
-      await new Promise<void>((resolve, reject) => {
-        upload.single('avatarImage').bind(this as unknown as FastifyInstance)(
-          req,
-          res,
-          err => (err ? reject(err) : resolve()),
-        );
-      });
+      const file = req.body.avatarImage;
+      const fileBuffer = await file.toBuffer();
 
-      const { file } = req as IRequestWithFile;
+      filterFileType(file.mimetype, AVAILABLE_IMAGE_MIMETYPES);
+      filterFileSize(fileBuffer, FILE_SIZE_LIMIT_IN_MB.THREE_MEGABYTES);
+
+      const fileForUseCase: IFile = {
+        buffer: fileBuffer,
+        mimetype: file.mimetype,
+        encoding: file.encoding,
+        originalname: file.filename,
+      };
+
+      const parsedBody = parseMultiFormBody(req.body);
 
       const promise = chista.runUseCase(UserSignup, {
         params: {
-          ...(req.body || {}),
-          file,
+          ...parsedBody,
+          file: fileForUseCase,
         },
       });
 
@@ -53,8 +61,7 @@ export default {
         },
       };
 
-      if (error instanceof MulterError)
-        errorResponse.error.code = ERROR_CODE.BAD_REQUEST;
+      if (error instanceof Exception) errorResponse.error = error.toResponse();
 
       res.send(errorResponse);
     }

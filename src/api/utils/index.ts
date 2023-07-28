@@ -1,3 +1,3 @@
 export * as chista from './chista-utils';
-export { filterFileType } from './file-type-filter';
+export * from './file-utils';
 export * from './http-utils';

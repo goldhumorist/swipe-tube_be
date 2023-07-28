@@ -1,5 +1,5 @@
+import { MultipartFile } from '@fastify/multipart';
 import { FastifyRequest } from 'fastify';
-import { File } from 'fastify-multer/lib/interfaces';
 
 export interface IRequestWithSession extends FastifyRequest {
   session?: {
@@ -9,6 +9,13 @@ export interface IRequestWithSession extends FastifyRequest {
   };
 }
 
-export interface IRequestWithFile extends FastifyRequest {
-  file?: File;
+export interface ISignupBody {
+  avatarImage: MultipartFile;
+  email: string;
+  username: string;
+  password: string;
+}
+
+export interface IUploadVideoBody {
+  video: MultipartFile;
 }

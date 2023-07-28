@@ -12,7 +12,7 @@ const app = Fastify(fastifyOptions);
 app.register(plugins.formBody);
 app.register(plugins.cors, pluginsOptions.cors);
 app.register(plugins.helmet);
-app.register(plugins.fileContentParser);
+app.register(plugins.fileContentParser, pluginsOptions.fileContentParser);
 
 app.addHook('preHandler', handlers.preHandlerBodyLogger);
 
