@@ -1,92 +1,63 @@
 import { loggerFactory } from '../../infrastructure/logger';
-import fs from 'fs/promises';
 import installerFfmpeg from '@ffmpeg-installer/ffmpeg';
-import installerFfprobe from '@ffprobe-installer/ffprobe';
 import ffmpeg from 'fluent-ffmpeg';
-import path from 'path';
+import stream, { Readable } from 'stream';
 
 const logger = loggerFactory.getLogger(__filename);
 
 const ffmpegPath = installerFfmpeg.path;
-const ffprobePath = installerFfprobe.path;
 
 export default class VideoService {
   private ffmpegInstance: ffmpeg.FfmpegCommand;
-  private tempFilesDirectory = path.resolve(
-    __dirname,
-    '../../../',
-    'temp-files',
-  );
-  private thumbnailConfig = {
-    timingForThumbnail: '00:00:05',
-    size: '1080x1920',
-    frames: 1,
-  };
 
+  private thumbnailConfig = {
+    inputFormat: 'mp4',
+    frames: 1,
+    outputFormat: 'image2pipe',
+    outputOptions: ['-ss', '00:00:05', '-vf', 'scale=1080:1920'],
+  };
   constructor() {
     if (!this.ffmpegInstance) {
-      ffmpeg.setFfprobePath(ffprobePath);
       ffmpeg.setFfmpegPath(ffmpegPath);
-
       this.ffmpegInstance = ffmpeg();
     }
   }
 
-  async createThumbnailForVideo(
-    videoBuffer: Buffer,
-    options: { videoFileName: string; thumbnailFileName: string },
-  ) {
-    const { videoFileName, thumbnailFileName } = options;
+  async createThumbnailForVideo(videoBuffer: Buffer): Promise<Buffer> {
+    return new Promise<Buffer>((resolve, reject) => {
+      const videoStream = new Readable();
+      videoStream.push(videoBuffer);
+      videoStream.push(null);
 
-    const videoFilePath = `${this.tempFilesDirectory}/${videoFileName}`;
-    const thumbnailFilePath = `${this.tempFilesDirectory}/${thumbnailFileName}`;
+      let thumbnailBuffer = Buffer.alloc(0);
+      const thumbnailChunks: Buffer[] = [];
 
-    await fs.writeFile(videoFilePath, videoBuffer);
+      const thumbnailStream = new stream.PassThrough();
 
-    let thumbnailBuffer: Buffer | undefined;
-
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg()
-        .input(videoFilePath)
-        .output(thumbnailFilePath)
-        .seekInput(this.thumbnailConfig.timingForThumbnail)
-        .size(this.thumbnailConfig.size)
+      ffmpeg(videoStream)
+        .inputFormat(this.thumbnailConfig.inputFormat)
         .frames(this.thumbnailConfig.frames)
-        .on('end', () => resolve())
-        .on('error', error => reject(error))
-        .run();
-    })
-      .then(
-        async () => (thumbnailBuffer = await fs.readFile(thumbnailFilePath)),
-      )
-      .finally(async () => {
-        await this.removeFile(videoFilePath);
-        await this.removeFile(thumbnailFilePath);
+        .outputFormat(this.thumbnailConfig.outputFormat)
+        .outputOptions(...this.thumbnailConfig.outputOptions)
+        .on('error', error => {
+          reject(error);
+        })
+        .pipe(thumbnailStream);
+
+      thumbnailStream.on('data', chunk => {
+        thumbnailChunks.push(chunk);
       });
 
-    return thumbnailBuffer as Buffer;
+      thumbnailStream.on('end', () => {
+        thumbnailBuffer = Buffer.concat(thumbnailChunks);
+        resolve(thumbnailBuffer);
+      });
+
+      thumbnailStream.on('error', error => {
+        reject(error);
+      });
+    });
   }
-
-  async removeAllTempFiles() {
-    const files = (await fs.readdir(this.tempFilesDirectory)).filter(
-      file => file !== '.gitkeep',
-    );
-
-    await Promise.all(
-      files.map(async file => {
-        const filePath = path.join(this.tempFilesDirectory, file);
-        await this.removeFile(filePath);
-      }),
-    );
-  }
-
-  private removeFile = async (path: string) => {
-    try {
-      await fs.unlink(path);
-    } catch (error) {
-      logger.error('Error during deleting file', error);
-    }
-  };
 }
 
 export const videoService = new VideoService();
