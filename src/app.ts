@@ -2,7 +2,6 @@ import * as RestAPI from './api/rest-api/www';
 import { config } from './config';
 import { Database } from './domain-model';
 import { loggerFactory } from './infrastructure/logger';
-import { videoService } from './use-cases/utils/video';
 
 const logger = loggerFactory.getLogger(__filename);
 
@@ -12,8 +11,6 @@ async function main() {
   RestAPI.start({ appPort: config.server.port });
 
   Database.initModels();
-
-  await videoService.removeAllTempFiles();
 
   process.on('SIGTERM', async () => {
     logger.info('[App] SIGTERM signal catched');
@@ -44,8 +41,6 @@ async function main() {
     await RestAPI.stop();
 
     await Database.getInstance().close();
-
-    await videoService.removeAllTempFiles();
 
     logger.info('[App] Exit');
     process.exit(0);

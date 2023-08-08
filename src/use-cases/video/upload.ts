@@ -39,10 +39,6 @@ export default class UploadVideo extends UseCaseBase<
 
       const thumbnailBuffer = await videoService.createThumbnailForVideo(
         video.buffer,
-        {
-          videoFileName,
-          thumbnailFileName,
-        },
       );
 
       const savedVideo = await Video.create(

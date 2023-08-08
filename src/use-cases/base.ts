@@ -1,10 +1,11 @@
-import { Exception, ERROR_CODE } from '../global-help-utils';
+import { ERROR_CODE, Exception } from '../global-help-utils';
 import LIVR from 'livr';
 
 LIVR.Validator.defaultAutoTrim(true);
 
 export default class UseCaseBase<T, K> {
   static validationRules: object | null = null;
+  static cachedValidator: LIVR.Validator = null;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(...args) {}
@@ -31,7 +32,11 @@ export default class UseCaseBase<T, K> {
     if (!validationRules)
       throw new Error('ValidationRules should be specified');
 
-    const livrValidator = new LIVR.Validator(validationRules);
+    const livrValidator =
+      (this.constructor as typeof UseCaseBase).cachedValidator ||
+      new LIVR.Validator(validationRules).prepare();
+
+    (this.constructor as typeof UseCaseBase).cachedValidator = livrValidator;
 
     const validData = livrValidator.validate(data);
 
